@@ -27,6 +27,7 @@ const Publications = ({ isAdmin = false, limit, showAll = false, showBackButton 
 
   useEffect(() => {
     fetchPublications();
+        console.log("🔍 VITE_API_URL from config:", config.API_URL);
   }, []);
 
   const handleSave = async (pub) => {
