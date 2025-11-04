@@ -2,6 +2,7 @@
 
 import React from "react";
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
+
 const Footer = () => {
   const openContactModal = (e) => {
     e.preventDefault();
@@ -65,8 +66,7 @@ const Footer = () => {
             <a href="https://www.instagram.com/feedthehunger.india?igsh=MWs1MmhjMjd3Y3phcQ%3D%3D" target="_blank" rel="noreferrer" className="hover:text-text/20">
               <FaInstagram />
             </a>
-            
-            </a>
+           
           </div>
         </div>
       </div>
