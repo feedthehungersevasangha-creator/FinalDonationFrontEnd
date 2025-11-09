@@ -97,8 +97,8 @@ useEffect(() => {
 
  
   const amounts = {
-    monthly: ["800", "1200", "1800"],
-    onetime: ["2000", "5000", "10000"],
+    monthly: ["800", "1200", "1800" ,"2500"],
+    onetime: ["1000","2000", "5000", "10000","8000"],
   };
 
   const onSubmit = async (data) => {
