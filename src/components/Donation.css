@@ -61,6 +61,19 @@ textarea.valid {
 .input-row {
   @apply flex flex-col md:flex-row gap-4 my-3;
 }
+/* Declaration Row Fix */
+.declaration-row {
+  @apply flex items-start mt-3 mb-6 leading-snug text-gray-700;
+}
+
+.declaration-row input[type="checkbox"] {
+  @apply mt-1;
+}
+
+.declaration-row a {
+  @apply text-blue-500 hover:underline;
+}
+
 
 /* Donation Amount Options */
 .amount-options {
