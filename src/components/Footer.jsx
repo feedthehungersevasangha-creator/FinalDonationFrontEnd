@@ -296,11 +296,36 @@ const Footer = ({ isAdmin = false }) => {
                 Contact
               </a>
             </li>
-            <li>
+                   <li>
               <a
                 href="/privacy-policy"
                 className="hover:text-text/20 cursor-pointer"
               >
+                Privacy Policy
+              </a>
+            </li>
+            <li>
+              <a
+                href="/refund-policy"
+                className="hover:text-text/20 cursor-pointer"
+              >
+               Refund Policy
+              </a>
+            </li>
+            <li>
+              <a
+                href="/terms-and-conditions"
+                className="hover:text-text/20 cursor-pointer"
+              >
+               Terms And Conditions
+              </a>
+            </li><li>
+              <a
+                href="/contact-us"
+                className="hover:text-text/20 cursor-pointer"
+              >
+                ContactUs
+              </a>
             </li>
           </ul>
         </div>
