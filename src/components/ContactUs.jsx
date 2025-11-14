@@ -24,7 +24,6 @@ export default function ContactUs() {
   useEffect(() => {
     const handleOpen = () => openContact();
     document.addEventListener("openContact", handleOpen);
-        console.log("🔍 VITE_API_URL from config:", config.API_URL);
     return () => document.removeEventListener("openContact", handleOpen);
   }, []);
   const onSubmit = (data) => {
@@ -98,17 +97,7 @@ export default function ContactUs() {
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Email */}
-          <div>
-            <label className="block text-gray-600 mb-1">Your Email</label>
-            <input
-              type="email"
-              {...register("email", { required: true })}
-              className="border p-3 rounded-lg w-full focus:ring-2 focus:ring-purple-400 transition"
-              placeholder="Enter your email"
-            />
-            {errors.email && <span className="text-red-500 text-sm">Email is required</span>}
-          </div>
+          
 
           {/* Title */}
           <div>
@@ -121,7 +110,17 @@ export default function ContactUs() {
             />
             {errors.title && <span className="text-red-500 text-sm">Title is required</span>}
           </div>
-
+{/* Email */}
+          <div>
+            <label className="block text-gray-600 mb-1">Your Email</label>
+            <input
+              type="email"
+              {...register("email", { required: true })}
+              className="border p-3 rounded-lg w-full focus:ring-2 focus:ring-purple-400 transition"
+              placeholder="Enter your email"
+            />
+            {errors.email && <span className="text-red-500 text-sm">Email is required</span>}
+          </div>
           {/* Message */}
           <div>
             <label className="block text-gray-600 mb-1">Message</label>
