@@ -7,12 +7,5 @@ cmds = ["npm ci"]
 [phases.build]
 cmds = ["npm run build"]
 
-[phases.start]
-cmds = [
-  "cp nginx.conf /etc/nginx/conf.d/default.conf",
-  "nginx -g 'daemon off;'"
-]
-
-[static]
-buildDir = "dist"
-
+[start]
+cmd = "caddy run --config /app/Caddyfile"
