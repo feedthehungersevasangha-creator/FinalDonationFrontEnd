@@ -24,7 +24,7 @@ import ResetPassword from "../Admin/ResetPassword";
 import ReviewPage from "./components/ReviewPage.jsx";
 import PaymentPage from "./components/PaymentPage.jsx";
 import ThankYouPage from "./components/ThankYouPage.jsx";
-// import DeclarationPage from './components/DeclarationPage.jsx';
+import DeclarationPage from './components/DeclarationPage.jsx';
 import ContactPage from './components/ContactPage.jsx';
 import TermsPage from './components/TermsPage.jsx'
 import RefundPolicyPage from './components/RefundPolicyPage.jsx';
@@ -85,7 +85,7 @@ useEffect(() => {
     </>
   }
 />
-{/* <Route path="/declaration" element={<DeclarationPage />} /> */}
+  <Route path="/declaration" element={<DeclarationPage />} /> 
 <Route path="/terms-and-conditions" element={<TermsPage />} />
 <Route path="/contact-us" element={<ContactPage />} />
 <Route path="/refund-policy" element={<RefundPolicyPage />} />
