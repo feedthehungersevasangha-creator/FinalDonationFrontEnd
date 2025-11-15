@@ -167,8 +167,7 @@ const HeroMessage = ({ isAdmin = false }) => {
     <motion.div
       {...motionProps}
       className="
-        relative mx-auto rounded-2xl backdrop-blur-sm
-        shadow-[0_8px_30px_rgba(0,0,0,0.25)]
+        relative mx-auto rounded-2xl 
         p-3 sm:p-4 md:p-5
         w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl
         max-h-[42svh] sm:max-h-[45svh] md:max-h-[48svh]
