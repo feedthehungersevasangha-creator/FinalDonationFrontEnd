@@ -1,0 +1,7 @@
+:80
+
+root * /app/dist
+file_server
+
+# React Router fix
+try_files {path} /index.html
