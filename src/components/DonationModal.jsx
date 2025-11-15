@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
 import config from "../config";
-// import DeclarationPage from "./DeclarationPage";
+import DeclarationPage from "./DeclarationPage";
 
 function DonationModal() {
   const API_BASE = `${config.API_URL}`;
@@ -326,4 +326,5 @@ useEffect(() => {
 }
 
 export default DonationModal;
+
 
