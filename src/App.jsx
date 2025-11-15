@@ -85,7 +85,7 @@ useEffect(() => {
     </>
   }
 />
-<Route path="/declaration" element={<DeclarationPage />} />
+{/* <Route path="/declaration" element={<DeclarationPage />} /> */}
 <Route path="/terms-and-conditions" element={<TermsPage />} />
 <Route path="/contact-us" element={<ContactPage />} />
 <Route path="/refund-policy" element={<RefundPolicyPage />} />
