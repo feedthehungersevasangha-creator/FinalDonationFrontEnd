@@ -316,6 +316,24 @@ function DonationModal() {
 
       <div className="donate-info">
         <div className="info-box bg-white shadow-md rounded-xl p-6 space-y-4 text-gray-800">
+          {/* QR Payment Section */}
+<div className="mt-4">
+  <h3 className="text-lg font-semibold border-b pb-2 mb-2">
+    Pay Using QR Code
+  </h3>
+
+  <div className="flex justify-center">
+    <img
+      src="QRCode.jpg"   // <-- Replace with your QR image path
+      alt="Donate QR Code"
+      className="w-40 sm:w-48 md:w-56 lg:w-64 rounded-lg shadow"
+    />
+  </div>
+
+  <p className="text-center text-sm mt-3 text-gray-600">
+    Scan this QR code using any UPI app to make a quick donation.
+  </p>
+</div>
           <div>
             <h3 className="text-lg font-semibold border-b pb-2 mb-2">Contact Us</h3>
             <p className="text-sm">If you have questions or concerns about this Privacy Policy or our data practices, please contact us at:</p>
@@ -338,4 +356,5 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
