@@ -168,12 +168,14 @@ const [showContent, setShowContent] = useState(showAsPage || isAdmin);
           ) : (
             <h2 className="text-2xl font-bold">{safeData.title}</h2>
           )}
-          {/* <button
-            onClick={() => (isAdmin && onClose ? onClose() : closePrivacy())}
-            className="text-gray-500 hover:text-gray-800 text-xl font-bold"
-          >
-            &times;
-          </button> */}
+          {!showAsPage && (
+  <button
+    onClick={() => (isAdmin && onClose ? onClose() : closePrivacy())}
+    className="text-gray-500 hover:text-gray-800 text-xl font-bold"
+  >
+    &times;
+  </button>
+)}
         </div>
 
         {/* Subheading */}
