@@ -131,7 +131,7 @@ function DonationModal() {
       bankName: data.bankName,
       ifsc: data.ifsc,
       accountNumber: data.accountNumber,
-      // declaration: data.declaration,
+      declaration: data.declaration,
     };
       navigate("/review", { state: donationData });
   };
@@ -356,5 +356,6 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
 
