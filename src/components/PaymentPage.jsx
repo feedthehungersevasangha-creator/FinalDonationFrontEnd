@@ -143,7 +143,7 @@ function PaymentPage() {
       navigate("/");
       return;
     }
-    // load Razorpay and get location once
+    // load Razorpay 
     loadRazorpayScript();
   }, []);
 
@@ -156,7 +156,7 @@ function PaymentPage() {
       document.body.appendChild(script);
     });
     
-
+ // ONE-TIME ORDER
   const createOrderOnBackend = async (amountInRupees) => {
     const res = await axios.post(`${API_BASE}/payment/create-order`, {
       ...donationData,
@@ -164,8 +164,8 @@ function PaymentPage() {
     });
     return res.data;
   };
+     // SUBSCRIPTION 
 const createSubscriptionOnBackend = async (donorId, amount) => {
-  // ensure integer rupees
   const intAmount = Math.round(Number(amount));
   const res = await axios.post(`${API_BASE}/payment/create-subscription`, {
     donorId,
@@ -173,20 +173,17 @@ const createSubscriptionOnBackend = async (donorId, amount) => {
   });
   return res.data;
 };
-
-
   const verifyPaymentAndSave = async (payload) => {
     const res = await axios.post(`${API_BASE}/payment/verify`, payload);
     return res.data;
   };
-
+  // ONE-TIME PAYMENT FLOW
   const startPayment = async () => {
     try {
       setStatus("⏳ Creating order...");
       const order = await createOrderOnBackend(
         donationData.amount,
       );
-
       const options = {
         key: order.keyId,
         amount: order.amount,
@@ -238,6 +235,7 @@ const createSubscriptionOnBackend = async (donorId, amount) => {
       setStatus("❌ " + err.message);
     }
   };
+      // SUBSCRIPTION PAYMENT FLOW (MANDATE)
   const startSubscription = async () => {
   try {
     setStatus("Creating donor record...");
@@ -274,46 +272,7 @@ const options = {
   },
   theme: { color: "#0d6efd" },
 };
-
-//    const subRes = await createSubscriptionOnBackend(donorId, donationData.amount);
-//     if (!subRes.data.success) {
-//       setStatus("Subscription creation failed");
-//       return;
-//     }
-// const options = {
-//   key: subRes.data.keyId,
-//   subscription_id: subRes.data.subscription_id,
-//   name: "Feed The Hunger Foundation",
-//   description: "Monthly Donation Subscription",
-//   prefill: {
-//     name: `${donationData.firstName} ${donationData.lastName}`,
-//     email: donationData.email,
-//     contact: donationData.mobile,
-//   },
-//   handler: function (response) {
-//     navigate("/thankyou", {
-//       state: { ...donationData, subscriptionId: subRes.data.subscription_id }
-//     });
-//   },
-//   theme: { color: "#0d6efd" },
-// };
-
-    // const options = {
-    //   key: subRes.data.keyId,
-    //   subscription_id: subRes.data.subscription_id,
-    //   name: "Feed The Hunger Foundation",
-    //   description: "Monthly Donation Subscription",
-    //   handler: function () {
-    //     navigate("/thankyou", {
-    //       state: {
-    //         ...donationData,
-    //         subscriptionId: subRes.data.subscription_id,
-    //       }
-    //     });
-    //   },
-    //   theme: { color: "#0d6efd" },
-    // };
-
+  
     const rz = new window.Razorpay(options);
     rz.open();
 
@@ -323,14 +282,14 @@ const options = {
   }
 };
 
- const isSubscription =
-    donationData.frequency === "monthly" &&
-    donationData.paymentMode === "E-Mandate"||
-     donationData.paymentMode === "UPI";
+ // const isSubscription =
+ //    donationData.frequency === "monthly" &&
+ //    donationData.paymentMode === "E-Mandate"||
+ //     donationData.paymentMode === "UPI";
 
-  const isOneTime =
-    donationData.frequency === "onetime" 
-   ;
+ //  const isOneTime =
+ //    donationData.frequency === "onetime" 
+ //   ;
 
 
   return (
@@ -373,5 +332,6 @@ const options = {
 }
 
 export default PaymentPage;
+
 
 
