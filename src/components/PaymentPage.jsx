@@ -250,6 +250,7 @@ const createSubscriptionOnBackend = async (donorId, amount) => {
 
     setStatus("Creating subscription...");
 const subRes = await createSubscriptionOnBackend(donorId, donationData.amount);
+console.log("Subscription Response", subRes);
 
 if (!subRes.success) {
   setStatus("Subscription creation failed");
@@ -372,4 +373,5 @@ const options = {
 }
 
 export default PaymentPage;
+
 
