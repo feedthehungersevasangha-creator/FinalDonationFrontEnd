@@ -249,15 +249,16 @@ const createSubscriptionOnBackend = async (donorId, amount) => {
     const donorId = donorRes.data.donorId;
 
     setStatus("Creating subscription...");
+const subRes = await createSubscriptionOnBackend(donorId, donationData.amount);
 
-   const subRes = await createSubscriptionOnBackend(donorId, donationData.amount);
-    if (!subRes.data.success) {
-      setStatus("Subscription creation failed");
-      return;
-    }
+if (!subRes.success) {
+  setStatus("Subscription creation failed");
+  return;
+}
+
 const options = {
-  key: subRes.data.keyId,
-  subscription_id: subRes.data.subscription_id,
+  key: subRes.keyId,
+  subscription_id: subRes.subscription_id,
   name: "Feed The Hunger Foundation",
   description: "Monthly Donation Subscription",
   prefill: {
@@ -267,11 +268,34 @@ const options = {
   },
   handler: function (response) {
     navigate("/thankyou", {
-      state: { ...donationData, subscriptionId: subRes.data.subscription_id }
+      state: { ...donationData, subscriptionId: subRes.subscription_id },
     });
   },
   theme: { color: "#0d6efd" },
 };
+
+//    const subRes = await createSubscriptionOnBackend(donorId, donationData.amount);
+//     if (!subRes.data.success) {
+//       setStatus("Subscription creation failed");
+//       return;
+//     }
+// const options = {
+//   key: subRes.data.keyId,
+//   subscription_id: subRes.data.subscription_id,
+//   name: "Feed The Hunger Foundation",
+//   description: "Monthly Donation Subscription",
+//   prefill: {
+//     name: `${donationData.firstName} ${donationData.lastName}`,
+//     email: donationData.email,
+//     contact: donationData.mobile,
+//   },
+//   handler: function (response) {
+//     navigate("/thankyou", {
+//       state: { ...donationData, subscriptionId: subRes.data.subscription_id }
+//     });
+//   },
+//   theme: { color: "#0d6efd" },
+// };
 
     // const options = {
     //   key: subRes.data.keyId,
@@ -348,3 +372,4 @@ const options = {
 }
 
 export default PaymentPage;
+
