@@ -336,11 +336,31 @@ function DonationModal() {
 </div>
           <div>
             <h3 className="text-lg font-semibold border-b pb-2 mb-2">Contact Us</h3>
-            <p className="text-sm">If you have questions or concerns about this Privacy Policy or our data practices, please contact us at:</p>
+            <p className="text-sm ">If you have questions or concerns about this Privacy Policy or our data practices, please contact us at:</p>
             {/* <p className="text-sm font-medium">Email: <span className="font-normal">feedthehunger.india2025@gmail.com</span></p> */}
-            <p className="text-sm ">Email: <span className="font-normal">supporter.services@feedthehungersevasangha.org</span></p>
+            {/* <p className="text-sm ">Email: <span className="font-normal">supporter.services@feedthehungersevasangha.org</span></p>
 
-            <p className="text-sm font-medium">Call: <span className="font-normal">8884260100</span></p>
+            <p className="text-sm font-medium">Call: <span className="font-normal">8884260100</span></p> */}
+            <p className="text-sm">
+  Email:{" "}
+  <a
+    href="mailto:supporter.services@feedthehungersevasangha.org"
+    className="text-blue-600 underline break-all"
+  >
+    supporter.services@feedthehungersevasangha.org
+  </a>
+</p>
+
+<p className="text-sm">
+  Call:{" "}
+  <a
+    href="tel:8884260100"
+    className="text-blue-600 underline"
+  >
+    8884260100
+  </a>
+</p>
+
           </div>
           <div>
             <h3 className="text-lg font-semibold border-b pb-2 mb-2">Terms & Conditions</h3>
