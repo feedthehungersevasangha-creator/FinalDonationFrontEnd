@@ -12,8 +12,26 @@ export default function ContactPage() {
           </p>
 
           <div className="mt-6 space-y-2 text-gray-800 text-lg">
-            <p><strong>Email:</strong> supporter.services@feedthehungersevasangha.org</p>
-            <p><strong>Phone:</strong> 8884260100</p>
+         <p className="text-sm">
+  Email:{" "}
+  <a
+    href="mailto:supporter.services@feedthehungersevasangha.org"
+    className="text-blue-600 underline break-all"
+  >
+    supporter.services@feedthehungersevasangha.org
+  </a>
+</p>
+
+<p className="text-sm">
+  Call:{" "}
+  <a
+    href="tel:8884260100"
+    className="text-blue-600 underline"
+  >
+    8884260100
+  </a>
+</p>
+
             <p><strong>Address:</strong> Bangalore, India</p>
           </div>
         </div>
@@ -22,4 +40,5 @@ export default function ContactPage() {
     </>
   );
 }
+
 
