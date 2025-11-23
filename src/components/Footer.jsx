@@ -193,7 +193,6 @@ const Footer = ({ isAdmin = false }) => {
 
             <li><a href="#programmes" onClick={handleNavigation("programmes", "Programmes", programmes)} className="hover:text-text/40">Programmes</a></li>
 
-            <li><a href="#contact" onClick={openContactModal} className="hover:text-text/40">Contact</a></li>
 
             <li><a href="/privacy-policy" className="hover:text-text/40">Privacy Policy</a></li>
             <li><a href="/refund-policy" className="hover:text-text/40">Refund Policy</a></li>
