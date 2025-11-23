@@ -337,7 +337,9 @@ function DonationModal() {
           <div>
             <h3 className="text-lg font-semibold border-b pb-2 mb-2">Contact Us</h3>
             <p className="text-sm">If you have questions or concerns about this Privacy Policy or our data practices, please contact us at:</p>
-            <p className="text-sm font-medium">Email: <span className="font-normal">feedthehunger.india2025@gmail.com</span></p>
+            {/* <p className="text-sm font-medium">Email: <span className="font-normal">feedthehunger.india2025@gmail.com</span></p> */}
+                        <p className="text-sm font-medium">Email: <span className="font-normal">supporter.services@feedthehungersevasangha.org</span></p>
+
             <p className="text-sm font-medium">Call: <span className="font-normal">8884260100</span></p>
           </div>
           <div>
@@ -356,6 +358,7 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
 
 
