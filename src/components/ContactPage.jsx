@@ -12,7 +12,7 @@ export default function ContactPage() {
           </p>
 
           <div className="mt-6 space-y-2 text-gray-800 text-lg">
-            <p><strong>Email:</strong> feedthehunger.india2025@gmail.com</p>
+            <p><strong>Email:</strong> supporter.services@feedthehungersevasangha.org</p>
             <p><strong>Phone:</strong> 8884260100</p>
             <p><strong>Address:</strong> Bangalore, India</p>
           </div>
@@ -22,3 +22,4 @@ export default function ContactPage() {
     </>
   );
 }
+
