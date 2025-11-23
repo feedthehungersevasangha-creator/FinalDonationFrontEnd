@@ -66,8 +66,8 @@ useEffect(() => {
             <>
               <Navbar />
               <Hero />
-              <Publications limit={4} />
-              <PressReleases limit={4} />
+              <Publications limit={3} />
+              <PressReleases limit={3} />
               <Programmes limit={6}/>
               {/* <About /> */}
               {/* <Explore /> */}
