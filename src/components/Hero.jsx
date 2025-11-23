@@ -103,7 +103,7 @@ const Hero = ({ isAdmin = false }) => {
         style={{ color: (isAdmin ? editingHero.textColor : hero.textColor) || "#fff" }}
       >
         {/* LEFT SIDE */}
-        <div className="flex-1 text-left w-full max-w-xl md:ml-5">
+        <div className="flex-1 text-left w-full max-w-xl md:ml-5 -mt-5">
           {isAdmin ? (
             <>
               <textarea
@@ -126,7 +126,7 @@ const Hero = ({ isAdmin = false }) => {
                   <li>✔ Minimum width: <strong>1200 px</strong></li>
                   <li>✔ Keep important content <strong>in the center</strong>.</li>
                   <li>✔ Avoid vertical or square images.</li>
-                </ul> 
+                </ul>
               </div>
 
               {/* RESPONSIVE FILE UPLOAD */}
@@ -179,17 +179,18 @@ const Hero = ({ isAdmin = false }) => {
 
 export default Hero;
 
+
+
 // import React, { useEffect, useState } from "react";
 // import axios from "axios";
 // import HeroMessage from "./HeroMessage";
 // import config from "../config";
-// import { FaUtensils, FaSmile, FaHandsHelping } from "react-icons/fa";
 
 // const Hero = ({ isAdmin = false }) => {
 //   const [hero, setHero] = useState(null);
 //   const [editingHero, setEditingHero] = useState(null);
 //   const [showText, setShowText] = useState(false);
-//   // Fetch hero data
+
 //   useEffect(() => {
 //     axios
 //       .get(`${config.API_URL}/hero`)
@@ -201,7 +202,6 @@ export default Hero;
 //       .catch((err) => console.error("Error fetching hero:", err));
 //   }, []);
 
-//   // Save updates
 //   const handleSave = async () => {
 //     try {
 //       const res = await axios.put(`${config.API_URL}/hero`, editingHero);
@@ -213,13 +213,11 @@ export default Hero;
 //       alert("Failed to update hero!");
 //     }
 //   };
-  
 
-//   // Upload new background image
-  
 //   const handleImageUpload = async (e) => {
 //     const file = e.target.files[0];
 //     if (!file) return;
+
 //     const formData = new FormData();
 //     formData.append("file", file);
 
@@ -227,6 +225,7 @@ export default Hero;
 //       const res = await axios.post(`${config.API_URL}/hero/upload-image`, formData, {
 //         headers: { "Content-Type": "multipart/form-data" },
 //       });
+
 //       setEditingHero((prev) => ({ ...prev, backgroundImage: res.data.backgroundImage }));
 //       setHero((prev) => ({ ...prev, backgroundImage: res.data.backgroundImage }));
 //     } catch (err) {
@@ -237,9 +236,8 @@ export default Hero;
 
 //   if (!hero || !editingHero) return <div>Loading...</div>;
 
-//   // HeroMessage lines with icons
 //   const linesFromState = [
-//     { text: editingHero.mealText  },
+//     { text: editingHero.mealText },
 //     { text: editingHero.smileText },
 //     { text: editingHero.handsText },
 //   ];
@@ -259,45 +257,16 @@ export default Hero;
 //   return (
 //     <section
 //       id="home"
-//       // className="relative w-full flex flex-col items-center justify-center px-4 overflow-hidden min-h-[60vh]"
-//       className="relative w-full flex flex-col items-center justify-center py-20 sm:py-32 md:py-40 px-4 overflow-hidden"
+//       className="relative w-full flex flex-col items-center justify-center 
+//       py-20 sm:py-32 md:py-40 px-4 overflow-hidden"
 //       style={{
-//   backgroundImage: `
-//     url(${hero.backgroundImage}), 
-    
-//     url(${hero.backgroundImage})
-//   `,
-//   backgroundSize: "contain,130%",
-//   backgroundPosition: "center,center,center ",
-//   backgroundRepeat: "no-repeat, repeat, repeat",
-// }}
-// //       style={{
-// //   backgroundImage: `url(${hero.backgroundImage})`,
-// //   backgroundSize: "contain",
-// //   backgroundPosition: "center",
-// //   backgroundRepeat: "no-repeat",
-// //   backgroundColor: "#000",
-// // }}
-
+//         backgroundImage: `url(${hero.backgroundImage})`,
+//         backgroundSize: "cover",
+//         backgroundPosition: "center",
+//       }}
 //     >
-// {/* <section
-//   id="home"
-//   className="relative w-full flex flex-col items-center justify-center py-20 sm:py-32 md:py-40 px-4 overflow-hidden"
-// >
-//   <img
-//     src={hero.backgroundImage}
-//     alt="Hero Background"
-//     className="
-//       absolute inset-0 w-full h-full 
-//       object-contain    
-//       bg-black          
-//     "
-//   /> */}
+//       <div className="absolute inset-0 bg-black/40"></div>
 
-//   {/* Dark overlay to blend any background gaps */}
-//   <div className="absolute inset-0 bg-black/40"></div>
-
-//       {/* CENTER HEADING */}
 //       <div
 //         className={`relative text-center transition-all duration-700 ease-out ${
 //           showText ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
@@ -308,15 +277,16 @@ export default Hero;
 //           {hero.title}
 //         </h1>
 //       </div>
-//       {/* FLEX SECTION FOR LEFT + RIGHT CONTENT */}
+
 //       <div
-//         className={`relative w-full flex flex-col md:flex-row items-center justify-between gap-10 mt-8 md:mt-16 transition-all duration-700 ease-out ${
+//         className={`relative w-full flex flex-col md:flex-row items-center justify-between 
+//         gap-6 sm:gap-8 md:gap-12 mt-8 md:mt-16 transition-all duration-700 ease-out ${
 //           showText ? "opacity-100" : "opacity-0"
 //         }`}
 //         style={{ color: (isAdmin ? editingHero.textColor : hero.textColor) || "#fff" }}
 //       >
-//         {/* LEFT SIDE: Subtitle */}
-//         <div className="flex-1 text-left max-w-xl md:ml-5">
+//         {/* LEFT SIDE */}
+//         <div className="flex-1 text-left w-full max-w-xl md:ml-5">
 //           {isAdmin ? (
 //             <>
 //               <textarea
@@ -324,28 +294,43 @@ export default Hero;
 //                 onChange={(e) =>
 //                   setEditingHero({ ...editingHero, subtitle: e.target.value })
 //                 }
-//                 className="px-3 py-2 rounded text-black mb-4 w-full"
+//                 className="px-3 py-2 rounded text-black mb-4 w-full text-sm sm:text-base"
 //                 placeholder="Hero Subtitle"
 //               />
-//               {/* ⭐ Instructions for admin */}
-//             <div className="bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded shadow my-4">
-//               <h3 className="font-semibold text-lg mb-2">Hero Image Upload Rules</h3>
-//               <ul className="text-sm space-y-1">
-//                 <li>✔ Upload a <strong>horizontal / landscape</strong> banner image.</li>
-//                 <li>✔ Recommended size: <strong>1920 × 1080 px</strong> (16:9 ratio).</li>
-//                 <li>✔ Minimum width: <strong>1200 px</strong></li>
-//                 <li>✔ Keep important content <strong>in the center</strong>.</li>
-//                 <li>✔ Avoid vertical or square images.</li>
-//               </ul>
-//             </div>
 
-//               <div className="my-2">
-//                 <label className="block text-white mb-1">Change Background Image:</label>
-//                 <input type="file" accept="image/*" onChange={handleImageUpload} />
+//               <div className="bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800 
+//               p-3 sm:p-4 rounded shadow my-4 w-full">
+//                 <h3 className="font-semibold text-base sm:text-lg mb-2">
+//                   Hero Image Upload Rules
+//                 </h3>
+//                 <ul className="text-xs sm:text-sm space-y-1">
+//                   <li>✔ Upload a <strong>horizontal / landscape</strong> banner image.</li>
+//                   <li>✔ Recommended size: <strong>1920 × 1080 px</strong>.</li>
+//                   <li>✔ Minimum width: <strong>1200 px</strong></li>
+//                   <li>✔ Keep important content <strong>in the center</strong>.</li>
+//                   <li>✔ Avoid vertical or square images.</li>
+//                 </ul> 
+//               </div>
+
+//               {/* RESPONSIVE FILE UPLOAD */}
+//               <div className="my-3 w-full">
+//                 <label className="block text-white mb-2 text-sm sm:text-base font-medium">
+//                   Change Background Image:
+//                 </label>
+//                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
+//                   <input
+//                     type="file"
+//                     accept="image/*"
+//                     onChange={handleImageUpload}
+//                     className="block w-full sm:w-auto text-xs sm:text-sm 
+//                     file:px-3 file:py-1.5 file:rounded file:border file:bg-white 
+//                     file:text-black file:hover:bg-gray-100"
+//                   />
+//                 </div>
 //               </div>
 //             </>
 //           ) : (
-//             <p className="text-base sm:text-xl md:text-2xl text-gray-100 leading-relaxed">
+//             <p className="text-sm sm:text-lg md:text-2xl text-gray-100 leading-relaxed">
 //               {hero.subtitle}
 //             </p>
 //           )}
@@ -353,16 +338,16 @@ export default Hero;
 //           {isAdmin && (
 //             <button
 //               onClick={handleSave}
-//               className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+//               className="mt-6 px-5 py-2 bg-blue-600 text-white rounded-lg 
+//               hover:bg-blue-700 transition text-sm sm:text-base"
 //             >
 //               Save Changes
 //             </button>
 //           )}
 //         </div>
 
-//         {/* RIGHT SIDE: HeroMessage Box (no background color) */}
-//         <div className="flex-1 flex justify-center md:justify-end md:mr-5">
-//           <div className="p-4 text-center max-w-sm w-full">
+//         <div className="flex-1 flex justify-center md:justify-end md:mr-5 w-full">
+//           <div className="p-3 sm:p-4 text-center max-w-full sm:max-w-sm w-full">
 //             <HeroMessage
 //               isAdmin={isAdmin}
 //               lines={linesFromState}
