@@ -339,8 +339,8 @@ donorId: order.donorId
     }
 const options = {
   key: subRes.keyId,
-  subscription_id: subRes.data.subscription_id,
-  name: "Feed The Hunger Foundation",
+  subscription_id: subRes.subscription_id,
+  name: "Feed The Hunger Seva Sangha Foundation",
   description: "Monthly Donation Subscription",
   prefill: {
     name: `${donationData.firstName} ${donationData.lastName}`,
@@ -431,6 +431,7 @@ const options = {
 }
 
 export default PaymentPage;
+
 
 
 
