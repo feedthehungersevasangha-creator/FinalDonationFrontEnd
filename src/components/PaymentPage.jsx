@@ -272,7 +272,7 @@ const createSubscriptionOnBackend = async (donorId, amount) => {
         key: order.keyId,
         amount: order.amount,
         currency: "INR",
-        name: "Feed The Hunger Foundation",
+        name: "Feed The Hunger Seva Sangha Foundation",
         description: "Donation Payment",
         order_id: order.id,
         prefill: {
@@ -431,6 +431,7 @@ const options = {
 }
 
 export default PaymentPage;
+
 
 
 
