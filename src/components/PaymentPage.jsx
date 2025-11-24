@@ -333,7 +333,7 @@ donorId: order.donorId
     setStatus("Creating subscription...");
 
    const subRes = await createSubscriptionOnBackend(donorId, donationData.amount);
-    if (!subRes.data.success) {
+    if (!subRes.success) {
       setStatus("Subscription creation failed");
       return;
     }
@@ -349,7 +349,7 @@ const options = {
   },
   handler: function (response) {
     navigate("/thankyou", {
-      state: { ...donationData, subscriptionId: subRes.data.subscription_id ,  donorId: donorId               
+      state: { ...donationData, subscriptionId: subRes.subscription_id ,  donorId: donorId               
 }
     });
   },
@@ -431,6 +431,7 @@ const options = {
 }
 
 export default PaymentPage;
+
 
 
 
