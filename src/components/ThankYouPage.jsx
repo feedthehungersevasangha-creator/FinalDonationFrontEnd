@@ -1,3 +1,54 @@
+
+// --------------------------------------------------------------------
+// import React from "react";
+// import { useLocation, useNavigate } from "react-router-dom";
+
+// function ThankYouPage() {
+//   const { state } = useLocation();
+//   const navigate = useNavigate();
+
+//   const isSubscription = state?.subscriptionId ? true : false;
+
+//   return (
+//     <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
+//       <div className="bg-white p-8 rounded-xl shadow-md text-center max-w-md w-full">
+//         <h2 className="text-2xl font-bold mb-4 text-green-600">
+//           🎉 Thank You for Your Kind Support!
+//         </h2>
+
+//         {/* Amount */}
+//         <p className="text-gray-700 mb-2 text-lg">
+//           Your {isSubscription ? "monthly" : "one-time"} donation of  
+//           <span className="font-bold"> ₹{state?.amount}</span>  
+//           has been received successfully.
+//         </p>
+
+//         {/* PAYMENT / SUBSCRIPTION ID */}
+//         {isSubscription ? (
+//           <p className="text-sm text-gray-500 mb-6">
+//             Subscription ID: <span className="font-semibold">{state.subscriptionId}</span>
+//           </p>
+//         ) : (
+//           <p className="text-sm text-gray-500 mb-6">
+//             Payment ID: <span className="font-semibold">{state.paymentId}</span>
+//           </p>
+//         )}
+
+//         {/* Back Home */}
+//         <button
+//           onClick={() => navigate("/")}
+//           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+//         >
+//           Go Home
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default ThankYouPage;
+
+// /-----------------------------------------------------------------------------
 // import React from "react";
 // import { useLocation, useNavigate } from "react-router-dom";
 
@@ -25,15 +76,22 @@
 // }
 
 // export default ThankYouPage;
-// --------------------------------------------------------------------
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import config from "../config";
+const API_BASE = `${config.API_URL}`;
 
 function ThankYouPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
 
+  const donorId = state?.donorId; // ⭐ GET DONOR ID
   const isSubscription = state?.subscriptionId ? true : false;
+
+  const downloadReceipt = () => {
+    if (!donorId) return alert("Receipt unavailable");
+    window.open(`${API_BASE}/donors/download/${donorId}`, "_blank");
+  };
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
@@ -42,23 +100,32 @@ function ThankYouPage() {
           🎉 Thank You for Your Kind Support!
         </h2>
 
-        {/* Amount */}
         <p className="text-gray-700 mb-2 text-lg">
           Your {isSubscription ? "monthly" : "one-time"} donation of  
           <span className="font-bold"> ₹{state?.amount}</span>  
           has been received successfully.
         </p>
 
-        {/* PAYMENT / SUBSCRIPTION ID */}
+        {/* Show ID */}
         {isSubscription ? (
-          <p className="text-sm text-gray-500 mb-6">
-            Subscription ID: <span className="font-semibold">{state.subscriptionId}</span>
+          <p className="text-sm text-gray-500 mb-2">
+            Subscription ID: <b>{state.subscriptionId}</b>
           </p>
         ) : (
-          <p className="text-sm text-gray-500 mb-6">
-            Payment ID: <span className="font-semibold">{state.paymentId}</span>
+          <p className="text-sm text-gray-500 mb-2">
+            Payment ID: <b>{state.paymentId}</b>
           </p>
         )}
+
+        {/* ⭐ DOWNLOAD RECEIPT BUTTON */}
+        <button
+          onClick={downloadReceipt}
+          className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 mb-4"
+        >
+          Download Receipt
+        </button>
+
+        <br />
 
         {/* Back Home */}
         <button
@@ -73,4 +140,7 @@ function ThankYouPage() {
 }
 
 export default ThankYouPage;
+
+//--------------------------------------------------------------------------------------------------------
+
 
