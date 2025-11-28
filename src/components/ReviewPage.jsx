@@ -125,7 +125,10 @@ const handleEdit = () => {
       fromReview: true,
      donationData: {
        ...donationData,
-         startDay: donationData.startDay,  // ⭐ keep this
+         startDay: donationData.startDay, 
+       paymentMode:donationData.paymentMode,
+       
+       // ⭐ keep this
        declaration:
          donationData.declaration === true ||
          donationData.declaration === "Accepted",
@@ -196,6 +199,7 @@ const handleEdit = () => {
   );
 }
 export default ReviewPage;
+
 
 
 
