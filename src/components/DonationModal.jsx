@@ -289,7 +289,6 @@ function DonationModal() {
           {errors.ifsc && <p className="error">{errors.ifsc.message}</p>}
           {errors.accountNumber && <p className="error">{errors.accountNumber.message}</p>} 
         </div> */}
-        </div>
 
         {/* Declaration */}
 <div className="form-section mt-4">
@@ -395,6 +394,7 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
 
 
