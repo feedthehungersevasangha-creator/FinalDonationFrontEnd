@@ -127,10 +127,11 @@ function DonationModal() {
       uniqueId: data.uniqueId,
       frequency: freq,
       amount: data.amount === "other" ? data.customAmount : data.amount,
-      paymentMode: data.paymentMode,
-      bankName: data.bankName,
-      ifsc: data.ifsc,
-      accountNumber: data.accountNumber,
+          startDay: data.startDay,   // ⭐ NEW FIELD
+      // paymentMode: data.paymentMode,
+      // bankName: data.bankName,
+      // ifsc: data.ifsc,
+      // accountNumber: data.accountNumber,
       declaration: data.declaration,
     };
       navigate("/review", { state: donationData });
@@ -234,10 +235,25 @@ function DonationModal() {
           </div>
           {errors.uniqueId && <p className="error">{errors.uniqueId.message}</p>}
         </div>
-
-        {/* Payment Mode */}
         <div className="form-section">
-          {frequencyValue === "monthly" && (
+          {/* Start Date Selector for Monthly Donations */}
+{frequencyValue === "monthly" && (
+  <div className="form-section mt-4">
+    <h4>Select Mandate Start Date</h4>
+    <select
+      {...register("startDay")}
+      className="border rounded px-3 py-2 w-full"
+    >
+      <option value="5">5th of Next Month</option>
+      <option value="10">10th of Next Month</option>
+      <option value="15">15th of Next Month</option>
+    </select>
+  </div>
+)}
+          </div>
+{/* 
+        <div className="form-section">
+           {frequencyValue === "monthly" && (
             <div className="input-row mb-2">
               <select {...register("paymentMode")} className="border rounded px-2 mb-2 w-full">
                 <option value="">Please Select Donation Mode</option>
@@ -271,7 +287,8 @@ function DonationModal() {
 
           {errors.bankName && <p className="error">{errors.bankName.message}</p>}
           {errors.ifsc && <p className="error">{errors.ifsc.message}</p>}
-          {errors.accountNumber && <p className="error">{errors.accountNumber.message}</p>}
+          {errors.accountNumber && <p className="error">{errors.accountNumber.message}</p>} 
+        </div> */}
         </div>
 
         {/* Declaration */}
