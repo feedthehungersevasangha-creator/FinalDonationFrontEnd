@@ -125,7 +125,7 @@ function DonationModal() {
       frequency: freq,
       amount: data.amount === "other" ? data.customAmount : data.amount,
           startDay: data.startDay,   // ⭐ NEW FIELD
-      // paymentMode: data.paymentMode,
+      paymentMode: data.paymentMode,
       // bankName: data.bankName,
       // ifsc: data.ifsc,
       // accountNumber: data.accountNumber,
@@ -810,6 +810,7 @@ export default DonationModal;
 }
 
 export default DonationModal;
+
 
 
 
