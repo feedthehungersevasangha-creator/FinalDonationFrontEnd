@@ -252,6 +252,7 @@ function DonationModal() {
       {...register("startDay")}
       className="border rounded px-3 py-2 w-full"
     >
+      <option value="">Please Select Donation Mode</option>
       <option value="5">5th of Next Month</option>
       <option value="10">10th of Next Month</option>
       <option value="15">15th of Next Month</option>
@@ -406,6 +407,7 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
 
 
