@@ -233,6 +233,17 @@ function DonationModal() {
           {errors.uniqueId && <p className="error">{errors.uniqueId.message}</p>}
         </div>
         <div className="form-section">
+           {frequencyValue === "monthly" && (
+            <div className="input-row mb-2">
+              <select {...register("paymentMode")} className="border rounded px-2 mb-2 w-full">
+                <option value="">Please Select Donation Mode</option>
+                <option value="E-Mandate">Card,netbanking etc
+                </option>
+                <option value="UPI">UPI</option>
+              </select>
+              {errors.paymentMode && <p className="error">{errors.paymentMode.message}</p>}
+            </div>
+          )}
           {/* Start Date Selector for Monthly Donations */}
 {frequencyValue === "monthly" && (
   <div className="form-section mt-4">
@@ -395,6 +406,7 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
 
 
