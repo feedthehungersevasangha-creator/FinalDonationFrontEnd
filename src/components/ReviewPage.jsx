@@ -162,14 +162,18 @@ const handleEdit = () => {
           <div><strong>Unique ID:</strong> {donationData.uniqueId}</div>
           <div><strong>Frequency:</strong> {donationData.frequency}</div>
           <div><strong>Amount:</strong> ₹{donationData.amount}</div>
-          {/* <div><strong>Accepted Declaration:</strong> {donationData.declaration}</div> */}
+          {donationData.frequency === "monthly" && (
+  <>
+    <div><strong>Payment Mode:</strong> {donationData.paymentMode}</div>
+    <div><strong>Start Date:</strong> {donationData.startDay}th of Next Month</div>
+  </>
+)}
+
           <div>
   <strong>Accepted Declaration:</strong> 
   {donationData.declaration ? "Accepted" : "Not Accepted"}
 </div>
-{donationData.frequency === "monthly" && (
-  <div><strong>Mandate Start Date:</strong> {donationData.startDay}th of next month</div>
-)}
+
 
           
         </div>
@@ -192,6 +196,7 @@ const handleEdit = () => {
   );
 }
 export default ReviewPage;
+
 
 
 
