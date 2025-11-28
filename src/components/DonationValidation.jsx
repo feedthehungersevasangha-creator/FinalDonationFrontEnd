@@ -174,6 +174,11 @@ export const DonationValidation = yup.object().shape({
       then: (schema) =>
         schema.matches(/^[A-Z]{3}[0-9]{7}$/, "Invalid Voter ID format"),
     }),
+    paymentMode: yup.string().when("frequency", {
+    is: "monthly",
+    then: () => yup.string().required("Payment mode is required"),
+    otherwise: () => yup.string().nullable().notRequired(),
+  }),
     
   // paymentMode required only for monthly (optional for onetime)
   // paymentMode: yup.string().when("frequency", {
