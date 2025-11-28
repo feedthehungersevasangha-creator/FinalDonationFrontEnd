@@ -248,6 +248,9 @@ function DonationModal() {
       <option value="10">10th of Next Month</option>
       <option value="15">15th of Next Month</option>
     </select>
+    {errors.startDay && (
+      <p className="error">{errors.startDay.message}</p>
+    )}
   </div>
 )}
           </div>
@@ -394,6 +397,7 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
 
 
