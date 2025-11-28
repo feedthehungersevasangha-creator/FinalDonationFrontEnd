@@ -1,3 +1,5 @@
+
+
 // import React from "react";
 // import { useLocation, useNavigate } from "react-router-dom";
 // import axios from "axios";
@@ -14,8 +16,21 @@
 //     return null;
 //   }
 
+// // const handleEdit = () => {
+// //   navigate("/donate", { state: { fromReview: true, donationData } });
+// // };
 // const handleEdit = () => {
-//   navigate("/donate", { state: { fromReview: true, donationData } });
+//   navigate("/donate", {
+//     state: {
+//       fromReview: true,
+//      donationData: {
+//        ...donationData,
+//        declaration:
+//          donationData.declaration === true ||
+//          donationData.declaration === "Accepted",
+//      }
+//     }
+//   });
 // };
 
 //   const handleConfirm = async () => {
@@ -46,8 +61,13 @@
 //           <div><strong>Unique ID:</strong> {donationData.uniqueId}</div>
 //           <div><strong>Frequency:</strong> {donationData.frequency}</div>
 //           <div><strong>Amount:</strong> ₹{donationData.amount}</div>
-//           <div><strong>Accepted Declaration:</strong> {donationData.declaration}</div>
-//           {donationData.paymentMode && (
+//           {/* <div><strong>Accepted Declaration:</strong> {donationData.declaration}</div> */}
+//           <div>
+//   <strong>Accepted Declaration:</strong> 
+//   {donationData.declaration ? "Accepted" : "Not Accepted"}
+// </div>
+
+//            {donationData.paymentMode && (
 //             <div><strong>Payment Mode:</strong> {donationData.paymentMode}</div>
 //           )}
 //           {donationData.bankName && (
@@ -56,7 +76,7 @@
 //               <div><strong>IFSC:</strong> {donationData.ifsc}</div>
 //               <div><strong>Account Number:</strong> {donationData.accountNumber}</div>
 //             </>
-//           )}
+//           )} 
 //         </div>
 //         <div className="mt-8 flex justify-between">
 //           <button
@@ -77,6 +97,8 @@
 //   );
 // }
 // export default ReviewPage;
+
+
 
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -103,6 +125,7 @@ const handleEdit = () => {
       fromReview: true,
      donationData: {
        ...donationData,
+         startDay: donationData.startDay,  // ⭐ keep this
        declaration:
          donationData.declaration === true ||
          donationData.declaration === "Accepted",
@@ -144,17 +167,11 @@ const handleEdit = () => {
   <strong>Accepted Declaration:</strong> 
   {donationData.declaration ? "Accepted" : "Not Accepted"}
 </div>
+{donationData.frequency === "monthly" && (
+  <div><strong>Mandate Start Date:</strong> {donationData.startDay}th of next month</div>
+)}
 
-          {donationData.paymentMode && (
-            <div><strong>Payment Mode:</strong> {donationData.paymentMode}</div>
-          )}
-          {donationData.bankName && (
-            <>
-              <div><strong>Bank Name:</strong> {donationData.bankName}</div>
-              <div><strong>IFSC:</strong> {donationData.ifsc}</div>
-              <div><strong>Account Number:</strong> {donationData.accountNumber}</div>
-            </>
-          )}
+          
         </div>
         <div className="mt-8 flex justify-between">
           <button
@@ -175,4 +192,6 @@ const handleEdit = () => {
   );
 }
 export default ReviewPage;
+
+
 
