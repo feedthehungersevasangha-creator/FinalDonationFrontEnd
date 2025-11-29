@@ -216,7 +216,6 @@ function DonationModal() {
           <input type="date" {...register("dob")} className="border rounded px-2 mt-3 w-full" />
           {errors.dob && <p className="error">{errors.dob.message}</p>}
         </div>
-
         {/* Unique ID */}
         <div className="form-section">
           <h4>Unique Identification</h4>
@@ -237,9 +236,9 @@ function DonationModal() {
             <div className="input-row mb-2">
               <select {...register("paymentMode")} className="border rounded px-2 mb-2 w-full">
                 <option value="">Please Select Donation Mode</option>
-                <option value="E-Mandate">Card,netbanking etc
+                <option value="E-Mandate">Card,netbanking 
                 </option>
-                <option value="UPI">UPI</option>
+                {/* <option value="UPI">UPI</option> */}
               </select>
               {errors.paymentMode && <p className="error">{errors.paymentMode.message}</p>}
             </div>
@@ -407,6 +406,7 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
 
 
