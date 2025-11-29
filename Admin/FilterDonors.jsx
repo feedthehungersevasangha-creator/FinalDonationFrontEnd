@@ -331,7 +331,7 @@ const fetchCounts = async () => {
 
   try {
     const response = await axios.get(
-      `${config.API_URL}/donation-counts?from=${from}&to=${to}`
+      `${config.API_URL}/donation-counts`
     );
 
     if (response.data.success) {
