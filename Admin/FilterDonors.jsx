@@ -322,6 +322,9 @@
       const [loading, setLoading] = useState(false);
 const [counts, setCounts] = useState(null);
 const [countsOpen, setCountsOpen] = useState(false);
+const [editOpen, setEditOpen] = useState(false);
+const [editData, setEditData] = useState(null);
+
 
 // const fetchCounts = async () => {
 //   const values = getValues();
@@ -398,6 +401,49 @@ const [countsOpen, setCountsOpen] = useState(false);
       useEffect(() => {
         fetchAllDonors();
       }, []);
+const handleDelete = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this donor?")) return;
+
+  try {
+    const res = await axios.delete(`${API_BASE}/delete/${id}`);
+
+    if (res.data.success) {
+      alert("Donor deleted successfully");
+      fetchAllDonors(); // refresh
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Delete failed");
+  }
+};
+        const handleEdit = (donor) => {
+  setEditData(donor);
+  setEditOpen(true);
+};
+        const handleUpdate = async () => {
+  try {
+    const res = await axios.put(
+      `${API_BASE}/update/${editData.id}`,
+      editData
+    );
+
+    if (res.data.success) {
+      alert("Donor updated successfully");
+      setEditOpen(false);
+      fetchAllDonors();
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Update failed");
+  }
+};
+
+
+//         const handleEdit = (donor) => {
+//   alert("Edit feature coming soon");
+//   console.log("Editing donor:", donor);
+// };
+
 
       const searchDonors = async () => {
         const values = getValues();
@@ -653,7 +699,9 @@ if (values.razorpayCustomerId) payload.razorpayCustomerId = values.razorpayCusto
       "Mandate ID",
       "Mandate Status",
       "Monthly Amount",
-      "Razorpay Customer ID"
+      "Razorpay Customer ID",
+     "Edit",
+  "Delete"
     ].map((col) => (
       <th
         key={col}
@@ -706,6 +754,25 @@ if (values.razorpayCustomerId) payload.razorpayCustomerId = values.razorpayCusto
       <td className="border px-4 py-2">{d.mandateStatus}</td>
       <td className="border px-4 py-2">{d.monthlyAmount}</td>
       <td className="border px-4 py-2">{d.razorpayCustomerId}</td>
+        {/* EDIT BUTTON */}
+    <td className="border px-4 py-2">
+      <button
+        onClick={() => handleEdit(d)}
+        className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600"
+      >
+        Edit
+      </button>
+    </td>
+
+    {/* DELETE BUTTON */}
+    <td className="border px-4 py-2">
+      <button
+        onClick={() => handleDelete(d.id)}
+        className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
+      >
+        Delete
+      </button>
+    </td>
     </tr>
   ))}
 </tbody>
@@ -738,6 +805,101 @@ if (values.razorpayCustomerId) payload.razorpayCustomerId = values.razorpayCusto
       >
         Close
       </button>
+    </div>
+  </div>
+)}
+{editOpen && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50">
+    <div className="bg-white p-6 rounded-2xl shadow-xl w-[450px] animate-scaleIn">
+
+      <h2 className="text-xl font-semibold mb-4 text-center">
+        Edit Donor
+      </h2>
+
+      {editData && (
+        <div className="space-y-4">
+          
+          {/* FIRST NAME */}
+          <div>
+            <label className="text-gray-600 font-medium">First Name</label>
+            <input
+              value={editData.firstName || ""}
+              onChange={(e) =>
+                setEditData({ ...editData, firstName: e.target.value })
+              }
+              className="w-full p-2 border rounded-lg mt-1"
+            />
+          </div>
+
+          {/* LAST NAME */}
+          <div>
+            <label className="text-gray-600 font-medium">Last Name</label>
+            <input
+              value={editData.lastName || ""}
+              onChange={(e) =>
+                setEditData({ ...editData, lastName: e.target.value })
+              }
+              className="w-full p-2 border rounded-lg mt-1"
+            />
+          </div>
+
+          {/* EMAIL */}
+          <div>
+            <label className="text-gray-600 font-medium">Email</label>
+            <input
+              value={editData.email || ""}
+              onChange={(e) =>
+                setEditData({ ...editData, email: e.target.value })
+              }
+              className="w-full p-2 border rounded-lg mt-1"
+            />
+          </div>
+
+          {/* MOBILE */}
+          <div>
+            <label className="text-gray-600 font-medium">Mobile</label>
+            <input
+              value={editData.mobile || ""}
+              onChange={(e) =>
+                setEditData({ ...editData, mobile: e.target.value })
+              }
+              className="w-full p-2 border rounded-lg mt-1"
+            />
+          </div>
+
+          {/* AMOUNT */}
+          <div>
+            <label className="text-gray-600 font-medium">Amount</label>
+            <input
+              type="number"
+              value={editData.amount || ""}
+              onChange={(e) =>
+                setEditData({ ...editData, amount: e.target.value })
+              }
+              className="w-full p-2 border rounded-lg mt-1"
+            />
+          </div>
+
+        </div>
+      )}
+
+      {/* BUTTONS */}
+      <div className="flex gap-4 mt-6">
+        <button
+          onClick={handleUpdate}
+          className="flex-1 bg-green-500 hover:bg-green-400 text-white px-4 py-2 rounded-lg"
+        >
+          Update
+        </button>
+
+        <button
+          onClick={() => setEditOpen(false)}
+          className="flex-1 bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded-lg"
+        >
+          Cancel
+        </button>
+      </div>
+
     </div>
   </div>
 )}
