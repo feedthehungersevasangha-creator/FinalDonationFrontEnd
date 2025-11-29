@@ -323,7 +323,27 @@
 const [counts, setCounts] = useState(null);
 const [countsOpen, setCountsOpen] = useState(false);
 
-const fetchCounts = async () => {
+// const fetchCounts = async () => {
+//   const values = getValues();
+
+//   const from = values.startDate || "";
+//   const to = values.endDate || "";
+
+//   try {
+//     const response = await axios.get(
+//       `${config.API_URL}/donation-counts`
+//     );
+
+//     if (response.data.success) {
+//       setCounts(response.data.counts);
+//       setCountsOpen(true);
+//     }
+//   } catch (err) {
+//     console.error(err);
+//     alert("Failed to load donation counts");
+//   }
+// };
+        const fetchCounts = async () => {
   const values = getValues();
 
   const from = values.startDate || "";
@@ -331,7 +351,10 @@ const fetchCounts = async () => {
 
   try {
     const response = await axios.get(
-      `${config.API_URL}/donation-counts`
+      `${config.API_URL}/donors/donation-counts`,
+      {
+        params: { from, to },
+      }
     );
 
     if (response.data.success) {
@@ -343,6 +366,7 @@ const fetchCounts = async () => {
     alert("Failed to load donation counts");
   }
 };
+
 
       // const { register, getValues, reset } = useForm();
       const { register, getValues, reset } = useForm({
