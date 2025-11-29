@@ -588,7 +588,7 @@ if (values.razorpayCustomerId) payload.razorpayCustomerId = values.razorpayCusto
                  {/* NEW BUTTON */}
   <button
     onClick={fetchCounts}
-    className="bg-purple-700 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-500 transition"
+    className="bg-button text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-500 transition"
   >
     View Donation Stats
   </button>
