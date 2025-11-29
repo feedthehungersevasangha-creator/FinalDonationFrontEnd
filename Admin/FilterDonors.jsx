@@ -320,6 +320,29 @@
       const API_BASE = `${config.API_URL}/donors`;
       const [donors, setDonors] = useState([]);
       const [loading, setLoading] = useState(false);
+const [counts, setCounts] = useState(null);
+const [countsOpen, setCountsOpen] = useState(false);
+
+const fetchCounts = async () => {
+  const values = getValues();
+
+  const from = values.startDate || "";
+  const to = values.endDate || "";
+
+  try {
+    const response = await axios.get(
+      `${config.API_URL}/donation-counts?from=${from}&to=${to}`
+    );
+
+    if (response.data.success) {
+      setCounts(response.data.counts);
+      setCountsOpen(true);
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Failed to load donation counts");
+  }
+};
 
       // const { register, getValues, reset } = useForm();
       const { register, getValues, reset } = useForm({
@@ -562,6 +585,13 @@ if (values.razorpayCustomerId) payload.razorpayCustomerId = values.razorpayCusto
               >
                 Reset
               </button>
+                 {/* NEW BUTTON */}
+  <button
+    onClick={fetchCounts}
+    className="bg-purple-700 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-500 transition"
+  >
+    View Donation Stats
+  </button>
             </div>
           </div>
     <div className="bg-white rounded-2xl shadow-xl p-4">
@@ -660,6 +690,34 @@ if (values.razorpayCustomerId) payload.razorpayCustomerId = values.razorpayCusto
         </div>
         </div>
         </div>
+            {countsOpen && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50">
+    <div className="bg-white p-6 rounded-2xl shadow-xl w-[350px] animate-scaleIn">
+      <h2 className="text-xl font-semibold mb-4 text-center">
+        Donation Summary
+      </h2>
+
+      {counts ? (
+        <div className="space-y-2">
+          <p><strong>Total Donations:</strong> {counts.total || 0}</p>
+          <p><strong>One-Time Donations:</strong> {counts.oneTime || 0}</p>
+          <p><strong>Subscription Donations:</strong> {counts.subscription || 0}</p>
+          <p><strong>Failed Payments:</strong> {counts.failed || 0}</p>
+        </div>
+      ) : (
+        <p className="text-center">Loading...</p>
+      )}
+
+      <button
+        onClick={() => setCountsOpen(false)}
+        className="w-full mt-6 bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded-lg"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
       );
     }
