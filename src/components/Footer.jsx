@@ -195,9 +195,9 @@ const Footer = ({ isAdmin = false }) => {
 
 
             <li><a href="/privacy-policy" className="hover:text-text/40">Privacy Policy</a></li>
-            <li><a href="/refund-policy" className="hover:text-text/40">Refund Policy</a></li>
+            {/* <li><a href="/refund-policy" className="hover:text-text/40">Refund Policy</a></li>
             <li><a href="/terms-and-conditions" className="hover:text-text/40">Terms And Conditions</a></li>
-            <li><a href="/contact-us" className="hover:text-text/40">ContactUs</a></li>
+            <li><a href="/contact-us" className="hover:text-text/40">ContactUs</a></li> */}
           </ul>
         </div>
 
