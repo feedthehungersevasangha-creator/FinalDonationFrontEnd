@@ -272,7 +272,7 @@ const Footer = ({ isAdmin = false }) => {
 
       {/* COPYRIGHT */}
       <div className="text-center text-sm sm:text-base text-text mt-10 border-t border-gray-600 pt-4">
-        © {new Date().getFullYear()} Feed The Hunger. All rights reserved.
+        © {new Date().getFullYear()} Feed The Hunger Seva Sangha. All rights reserved.
       </div>
 
       {/* POPUP */}
