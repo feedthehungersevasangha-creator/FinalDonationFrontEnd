@@ -34,23 +34,36 @@ function DonationModal() {
     mode: "onChange",
     defaultValues:prefillData || { frequency: "monthly" },
   });
+//   useEffect(() => {
+//   console.log("📥 Returned from Declaration:", location.state);
+
+//   if (location.state?.donationData) {
+//     console.log("✔ Restoring donationData:", location.state.donationData);
+//     reset(location.state.donationData);
+//   } else {
+//     console.log("❌ No donationData received");
+//   }
+
+//   if (location.state?.declarationChecked) {
+//     console.log("✔ Declaration was accepted");
+//     setValue("declaration", true);
+//   } else {
+//     console.log("❌ Declaration NOT accepted");
+//   }
+// }, [location.state, reset, setValue]);
   useEffect(() => {
   console.log("📥 Returned from Declaration:", location.state);
 
   if (location.state?.donationData) {
     console.log("✔ Restoring donationData:", location.state.donationData);
+
+    // Restore everything EXACTLY as user left it
     reset(location.state.donationData);
   } else {
     console.log("❌ No donationData received");
   }
+}, [location.state, reset]);
 
-  if (location.state?.declarationChecked) {
-    console.log("✔ Declaration was accepted");
-    setValue("declaration", true);
-  } else {
-    console.log("❌ Declaration NOT accepted");
-  }
-}, [location.state, reset, setValue]);
 
 // useEffect(() => {
 //   if (location.state?.donationData) {
@@ -405,6 +418,7 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
 
 
