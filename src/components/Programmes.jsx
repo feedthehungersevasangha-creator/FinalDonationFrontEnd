@@ -270,9 +270,12 @@ const ProgrammeCard = ({
     </div>
   );
 };
-
 const AdminForm = ({ newProg, setNewProg, handleAdd }) => (
-  <div className="bg-white/5 backdrop-blur-lg border border-gray-700 p-6 rounded-lg shadow max-w-md mx-auto">
+  <div className="bg-white/5 backdrop-blur-lg border border-gray-700 
+                  p-6 rounded-lg shadow 
+                  w-full max-w-sm mx-auto 
+                  overflow-hidden">
+
     <h3 className="text-lg font-bold text-text mb-3">Add New Programme</h3>
 
     <input
@@ -280,14 +283,14 @@ const AdminForm = ({ newProg, setNewProg, handleAdd }) => (
       placeholder="Title"
       value={newProg.title}
       onChange={(e) => setNewProg({ ...newProg, title: e.target.value })}
-      className="w-full mb-3 px-3 py-2 rounded border"
+      className="w-full mb-3 px-3 py-2 rounded border break-words"
     />
 
     <textarea
       placeholder="Description"
       value={newProg.description}
       onChange={(e) => setNewProg({ ...newProg, description: e.target.value })}
-      className="w-full mb-3 px-3 py-2 rounded border"
+      className="w-full mb-3 px-3 py-2 rounded border break-words"
     />
 
     <input
@@ -301,12 +304,12 @@ const AdminForm = ({ newProg, setNewProg, handleAdd }) => (
       type="file"
       accept="image/*"
       onChange={(e) => setNewProg({ ...newProg, icon: e.target.files[0] })}
-      className="mb-4 w-full"
+      className="mb-4 w-full break-words"
     />
 
     <button
       onClick={handleAdd}
-      className="w-full px-4 py-2 bg-green-700 text-white rounded-lg"
+      className="w-full px-4 py-2 bg-green-700 text-white rounded-lg text-center break-words"
     >
       Add Programme
     </button>
@@ -314,6 +317,8 @@ const AdminForm = ({ newProg, setNewProg, handleAdd }) => (
 );
 
 export default Programmes;
+
+
 
 
 
