@@ -311,7 +311,6 @@ function DonationModal() {
     <input
       type="checkbox"
       {...register("declaration")}
-      className="hidden"
     />
 
     {/* Text */}
@@ -406,6 +405,7 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
 
 
