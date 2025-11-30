@@ -170,15 +170,6 @@ const Navbar = () => {
           <nav className="absolute top-full left-0 w-full bg-heroBG/95 backdrop-blur-lg shadow-lg z-20 md:hidden">
             <ul className="flex flex-col p-4 space-y-3">
               {renderLinks().props.children}
-              <li className="py-2">
-                <Link
-                  to="/donate"
-                  className="text-text bg-button hover:bg-button/60 px-3 py-2 rounded-lg shadow"
-                  onClick={handleCloseMenu}
-                >
-                  Donate
-                </Link>
-              </li>
             </ul>
           </nav>
         )}
