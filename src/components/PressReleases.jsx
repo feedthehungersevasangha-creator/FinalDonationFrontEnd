@@ -6,8 +6,8 @@ import config from "../config";
 const PressReleases = ({ isAdmin = false, limit, showAll = false, showBackButton = false }) => {
   const [pressReleases, setPressReleases] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editingRelease, setEditingRelease] = useState(null);
-
+  const [editingReleaseId, setEditingReleaseId] = useState(null);
+  const [editingData, setEditingData] = useState({});
   const [newRelease, setNewRelease] = useState({
     title: "",
     excerpt: "",
@@ -16,60 +16,77 @@ const PressReleases = ({ isAdmin = false, limit, showAll = false, showBackButton
     date: "",
     image: null,
   });
-
+  const [saving, setSaving] = useState(false);
   const [adding, setAdding] = useState(false);
 
   const navigate = useNavigate();
 
-  const fetchPressReleases = () => {
-    axios
-      .get(`${config.API_URL}/press-releases`)
-      .then((res) => {
-        setPressReleases(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching press releases:", err);
-        setLoading(false);
-      });
+  const fetchPressReleases = async () => {
+    try {
+      const res = await axios.get(`${config.API_URL}/press-releases`);
+      setPressReleases(res.data);
+    } catch (err) {
+      console.error("Error fetching press releases:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchPressReleases();
   }, []);
 
-  const handleSave = async (release) => {
+  // --- Editing functions ---
+  const startEditing = (release) => {
+    setEditingReleaseId(release.id);
+    setEditingData({ ...release });
+  };
+
+  const handleEditChange = (field, value) => {
+    setEditingData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const saveEdit = async () => {
+    if (!editingData.title || !editingData.excerpt || !editingData.summary || !editingData.content || !editingData.date) {
+      alert("All fields are required!");
+      return;
+    }
+    setSaving(true);
     try {
-      await axios.put(`${config.API_URL}/press-releases/${release.id}`, {
-        title: release.title,
-        excerpt: release.excerpt,
-        summary: release.summary,
-        content: release.content,
-        date: release.date,
-      });
-      fetchPressReleases();
-      setEditingRelease(null);
+      await axios.put(`${config.API_URL}/press-releases/${editingReleaseId}`, editingData);
+
+      // Optimistic update
+      setPressReleases((prev) =>
+        prev.map((r) => (r.id === editingReleaseId ? { ...r, ...editingData } : r))
+      );
+
+      setEditingReleaseId(null);
       alert("Press release updated!");
     } catch (err) {
       console.error("Error updating press release:", err);
       alert("Failed to update!");
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleImageUpload = async (e, release) => {
-    const file = e.target.files[0];
+  const uploadImage = async (file, releaseId) => {
     if (!file) return;
-
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      await axios.post(
-        `${config.API_URL}/press-releases/${release.id}/upload-image`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+      await axios.post(`${config.API_URL}/press-releases/${releaseId}/upload-image`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      // Update local state with new image
+      setPressReleases((prev) =>
+        prev.map((r) =>
+          r.id === releaseId ? { ...r, imageUrl: URL.createObjectURL(file) } : r
+        )
       );
-      fetchPressReleases();
+
       alert("Image uploaded!");
     } catch (err) {
       console.error("Error uploading image:", err);
@@ -79,10 +96,9 @@ const PressReleases = ({ isAdmin = false, limit, showAll = false, showBackButton
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this press release?")) return;
-
     try {
       await axios.delete(`${config.API_URL}/press-releases/${id}`);
-      fetchPressReleases();
+      setPressReleases((prev) => prev.filter((r) => r.id !== id));
       alert("Press release deleted!");
     } catch (err) {
       console.error("Error deleting:", err);
@@ -96,41 +112,17 @@ const PressReleases = ({ isAdmin = false, limit, showAll = false, showBackButton
       return;
     }
 
+    setAdding(true);
     try {
-      setAdding(true);
-
-      const res = await axios.post(`${config.API_URL}/press-releases`, {
-        title: newRelease.title,
-        excerpt: newRelease.excerpt,
-        summary: newRelease.summary,
-        content: newRelease.content,
-        date: newRelease.date,
-      });
-
+      const res = await axios.post(`${config.API_URL}/press-releases`, newRelease);
       const created = res.data;
 
       if (newRelease.image) {
-        const formData = new FormData();
-        formData.append("file", newRelease.image);
-
-        await axios.post(
-          `${config.API_URL}/press-releases/${created.id}/upload-image`,
-          formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
-        );
+        await uploadImage(newRelease.image, created.id);
       }
 
-      fetchPressReleases();
-
-      setNewRelease({
-        title: "",
-        excerpt: "",
-        summary: "",
-        content: "",
-        date: "",
-        image: null,
-      });
-
+      setPressReleases((prev) => [created, ...prev]);
+      setNewRelease({ title: "", excerpt: "", summary: "", content: "", date: "", image: null });
       alert("Press release added!");
     } catch (err) {
       console.error(err);
@@ -147,11 +139,10 @@ const PressReleases = ({ isAdmin = false, limit, showAll = false, showBackButton
     ? pressReleases
     : showAll
     ? pressReleases
-    : pressReleases.slice(0, limit ?? 2);
+    : pressReleases.slice(0, limit > 0 ? limit : 2);
 
   return (
     <div id="press" className="relative bg-heroBG py-6 px-4 sm:px-6 md:px-10">
-
       {showBackButton && (
         <button
           onClick={() => navigate(-1)}
@@ -169,13 +160,9 @@ const PressReleases = ({ isAdmin = false, limit, showAll = false, showBackButton
         </div>
       )}
 
-      {/* GRID LAYOUT */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
         {visibleReleases.map((release) => (
-          <div
-            key={release.id}
-            className="bg-secondary rounded-xl shadow-md overflow-hidden max-w-[500px] w-full transition"
-          >
+          <div key={release.id} className="bg-secondary rounded-xl shadow-md overflow-hidden max-w-[500px] w-full transition">
             <div className="w-full">
               <img
                 src={release.imageUrl || "https://via.placeholder.com/300x200?text=No+Image"}
@@ -188,87 +175,46 @@ const PressReleases = ({ isAdmin = false, limit, showAll = false, showBackButton
               <div className="w-full bg-black/10 p-2 text-center">
                 <label className="bg-black/70 text-white text-xs px-3 py-1 rounded cursor-pointer hover:bg-black transition">
                   Upload Image
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleImageUpload(e, release)}
-                    className="hidden"
-                  />
+                  <input type="file" accept="image/*" onChange={(e) => uploadImage(e.target.files[0], release.id)} className="hidden" />
                 </label>
               </div>
             )}
 
             <div className="p-4">
-              {editingRelease === release.id ? (
+              {editingReleaseId === release.id ? (
                 <>
                   <input
                     type="text"
-                    value={release.title}
-                    onChange={(e) =>
-                      setPressReleases((prev) =>
-                        prev.map((r) =>
-                          r.id === release.id ? { ...r, title: e.target.value } : r
-                        )
-                      )
-                    }
+                    value={editingData.title}
+                    onChange={(e) => handleEditChange("title", e.target.value)}
                     className="w-full px-3 py-2 rounded mb-2 text-black border"
                   />
-
                   <textarea
-                    value={release.excerpt}
-                    onChange={(e) =>
-                      setPressReleases((prev) =>
-                        prev.map((r) =>
-                          r.id === release.id ? { ...r, excerpt: e.target.value } : r
-                        )
-                      )
-                    }
+                    value={editingData.excerpt}
+                    onChange={(e) => handleEditChange("excerpt", e.target.value)}
                     className="w-full px-3 py-2 rounded mb-2 text-black border"
                   />
-
                   <textarea
-                    value={release.summary}
-                    onChange={(e) =>
-                      setPressReleases((prev) =>
-                        prev.map((r) =>
-                          r.id === release.id ? { ...r, summary: e.target.value } : r
-                        )
-                      )
-                    }
+                    value={editingData.summary}
+                    onChange={(e) => handleEditChange("summary", e.target.value)}
                     className="w-full px-3 py-2 rounded mb-2 text-black border"
                   />
-
                   <textarea
-                    value={release.content}
-                    onChange={(e) =>
-                      setPressReleases((prev) =>
-                        prev.map((r) =>
-                          r.id === release.id ? { ...r, content: e.target.value } : r
-                        )
-                      )
-                    }
+                    value={editingData.content}
+                    onChange={(e) => handleEditChange("content", e.target.value)}
                     className="w-full px-3 py-2 rounded mb-3 text-black border"
                   />
-
                   <input
                     type="date"
-                    value={release.date}
-                    onChange={(e) =>
-                      setPressReleases((prev) =>
-                        prev.map((r) =>
-                          r.id === release.id ? { ...r, date: e.target.value } : r
-                        )
-                      )
-                    }
+                    value={editingData.date}
+                    onChange={(e) => handleEditChange("date", e.target.value)}
                     className="w-full px-3 py-2 rounded mb-3 border text-black"
                   />
-
                   <div className="flex gap-2">
-                    <button onClick={() => handleSave(release)} className="px-3 py-1 bg-text text-white rounded">
-                      Save
+                    <button onClick={saveEdit} disabled={saving} className="px-3 py-1 bg-text text-white rounded">
+                      {saving ? "Saving…" : "Save"}
                     </button>
-
-                    <button onClick={() => setEditingRelease(null)} className="px-3 py-1 bg-gray-500 text-white rounded">
+                    <button onClick={() => setEditingReleaseId(null)} className="px-3 py-1 bg-gray-500 text-white rounded">
                       Cancel
                     </button>
                   </div>
@@ -276,38 +222,20 @@ const PressReleases = ({ isAdmin = false, limit, showAll = false, showBackButton
               ) : (
                 <>
                   <h3 className="text-xl text-text font-bold mb-2">{release.title}</h3>
-
-                  <p className="text-sm text-text mb-1 whitespace-normal break-words">
-                    {release.excerpt}
-                  </p>
-
-                  <p className="text-sm text-text mb-1 line-clamp-3">
-                    {release.summary}
-                  </p>
-
+                  <p className="text-sm text-text mb-1 whitespace-normal break-words">{release.excerpt}</p>
+                  <p className="text-sm text-text mb-1 line-clamp-3">{release.summary}</p>
                   <p className="text-xs text-text/70 mt-2">{release.date}</p>
-
                   {isAdmin ? (
                     <div className="flex gap-2 flex-wrap sm:flex-nowrap w-full mt-3">
-                      <button
-                        onClick={() => setEditingRelease(release.id)}
-                        className="px-3 py-1 bg-blue-600 text-white rounded w-full sm:w-auto"
-                      >
+                      <button onClick={() => startEditing(release)} className="px-3 py-1 bg-blue-600 text-white rounded w-full sm:w-auto">
                         Edit
                       </button>
-
-                      <button
-                        onClick={() => handleDelete(release.id)}
-                        className="px-3 py-1 bg-red-600 text-white rounded w-full sm:w-auto"
-                      >
+                      <button onClick={() => handleDelete(release.id)} className="px-3 py-1 bg-red-600 text-white rounded w-full sm:w-auto">
                         Delete
                       </button>
                     </div>
                   ) : (
-                    <button
-                      onClick={() => navigate(`/press-release/${release.id}`)}
-                      className="px-3 py-1 bg-button text-white rounded mt-2"
-                    >
+                    <button onClick={() => navigate(`/press-release/${release.id}`)} className="px-3 py-1 bg-button text-white rounded mt-2">
                       Read More
                     </button>
                   )}
@@ -329,35 +257,30 @@ const PressReleases = ({ isAdmin = false, limit, showAll = false, showBackButton
             onChange={(e) => setNewRelease({ ...newRelease, title: e.target.value })}
             className="w-full mb-2 px-3 py-2 rounded border text-black"
           />
-
           <textarea
             placeholder="Excerpt"
             value={newRelease.excerpt}
             onChange={(e) => setNewRelease({ ...newRelease, excerpt: e.target.value })}
             className="w-full mb-2 px-3 py-2 rounded border text-black"
           />
-
           <textarea
             placeholder="Summary"
             value={newRelease.summary}
             onChange={(e) => setNewRelease({ ...newRelease, summary: e.target.value })}
             className="w-full mb-2 px-3 py-2 rounded border text-black"
           />
-
           <textarea
             placeholder="Content"
             value={newRelease.content}
             onChange={(e) => setNewRelease({ ...newRelease, content: e.target.value })}
             className="w-full mb-2 px-3 py-2 rounded border text-black"
           />
-
           <input
             type="date"
             value={newRelease.date}
             onChange={(e) => setNewRelease({ ...newRelease, date: e.target.value })}
             className="w-full mb-2 px-3 py-2 rounded border text-black"
           />
-
           <label className="block text-sm font-medium mt-3 mb-1">Upload Image</label>
           <input
             type="file"
@@ -367,15 +290,14 @@ const PressReleases = ({ isAdmin = false, limit, showAll = false, showBackButton
           />
 
           <button
-  onClick={handleAdd}
-  disabled={adding}
-  className={`mt-4 px-4 py-3 w-full rounded text-white text-center bg-green-700 hover:bg-green-800 
-              active:scale-95 transition-all duration-200 whitespace-normal break-words leading-normal
-              ${adding ? "opacity-60 cursor-not-allowed bg-green-900" : ""}`}
->
-  {adding ? "Adding…" : "Add Press Release"}
-</button>
-
+            onClick={handleAdd}
+            disabled={adding}
+            className={`mt-4 px-4 py-3 w-full rounded text-white text-center bg-green-700 hover:bg-green-800 active:scale-95 transition-all duration-200 ${
+              adding ? "opacity-60 cursor-not-allowed bg-green-900" : ""
+            }`}
+          >
+            {adding ? "Adding…" : "Add Press Release"}
+          </button>
         </div>
       )}
     </div>
