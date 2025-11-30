@@ -77,10 +77,15 @@ const Hero = ({ isAdmin = false }) => {
       className="relative w-full flex flex-col items-center justify-center 
       py-20 sm:py-32 md:py-40 px-4 overflow-hidden"
       style={{
-        backgroundImage: `url(${hero.backgroundImage})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
+  backgroundImage: `
+    url(${hero.backgroundImage}), 
+    
+    url(${hero.backgroundImage})
+  `,
+  backgroundSize: "contain,130%",
+  backgroundPosition: "center,center,center ",
+  backgroundRepeat: "no-repeat, repeat, repeat",
+}}
     >
       <div className="absolute inset-0 bg-black/40"></div>
 
