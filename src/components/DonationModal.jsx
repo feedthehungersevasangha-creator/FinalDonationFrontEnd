@@ -236,7 +236,7 @@ function DonationModal() {
             <div className="input-row mb-2">
               <select {...register("paymentMode")} className="border rounded px-2 mb-2 w-full">
                 <option value="">Please Select Donation Mode</option>
-                <option value="E-Mandate">Card,netbanking 
+                <option value="E-Mandate">E-Mandate 
                 </option>
                 {/* <option value="UPI">UPI</option> */}
               </select>
@@ -406,6 +406,7 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
 
 
