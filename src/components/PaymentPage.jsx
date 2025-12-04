@@ -400,7 +400,7 @@ const startSubscription = async () => {
     const donorId = donorRes.data.donorId;
     console.log("🟢 Donor created:", donorId);
 
-    setStatus("🟡 Creating subscription (mandate)…");
+    setStatus("🟡 Creating E-Mandate");
 
     // 2️⃣ Create subscription (MANDATE) in backend
     const subRes = await axios.post(`${API_BASE}/payment/create-subscription`, {
@@ -409,10 +409,10 @@ const startSubscription = async () => {
       starterAmount: donationData.starterAmount || 10, // 5/10/15 first debit
     });
 
-    console.log("🟢 Subscription API response:", subRes.data);
+    console.log(" Subscription API response:", subRes.data);
 
     if (!subRes.data.success) {
-      setStatus("❌ Failed to create subscription");
+      setStatus("❌ Failed to create E-Mandate");
       return;
     }
 
@@ -431,7 +431,7 @@ const startSubscription = async () => {
       },
 
       handler: async function (response) {
-        console.log("🟢 Razorpay Subscription Response:", response);
+        console.log(" Razorpay Subscription Response:", response);
 
         // 4️⃣ VERIFY subscription signature
         const verifyRes = await axios.post(`${API_BASE}/payment/verify-subscription`, {
@@ -441,11 +441,11 @@ const startSubscription = async () => {
         });
 
         if (!verifyRes.data.success) {
-          setStatus("❌ Subscription verification failed!");
+          setStatus("❌ E-Mandate verification failed!");
           return;
         }
 
-        setStatus("🟢 Subscription Activated Successfully!");
+        setStatus("🟢 E-Mandate Activated Successfully!");
 
         // 5️⃣ Navigate
         navigate("/thankyou", {
@@ -459,14 +459,14 @@ const startSubscription = async () => {
 
       modal: {
         ondismiss: function () {
-          setStatus("❌ Subscription setup cancelled");
+          setStatus("❌ E-Mandate setup cancelled");
         },
       },
 
       theme: { color: "#0d6efd" },
     };
 
-    console.log("🟡 Opening Razorpay Subscription Checkout:", options);
+    console.log(" Opening Razorpay Subscription Checkout:", options);
 
     const rz = new window.Razorpay(options);
     rz.open();
@@ -497,12 +497,14 @@ const isSubscription =
           Razorpay Donation (India Only)
         </h2>
 {/* NORMAL PAYMENT */}
+{donationData.frequency === "onetime" && (
 <button
   onClick={startPayment}
   className="bg-yellow-500 text-white py-2 px-8 rounded-lg hover:bg-yellow-600 transition-colors w-full sm:w-auto"
 >
   Pay Once ₹{donationData?.amount}
 </button>
+    )}
 
 {/* MONTHLY E-MANDATE / SUBSCRIPTION */}
 {donationData.frequency === "monthly" && (
@@ -530,6 +532,7 @@ const isSubscription =
 }
 
 export default PaymentPage;
+
 
 
 
