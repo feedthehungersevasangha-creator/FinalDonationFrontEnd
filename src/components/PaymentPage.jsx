@@ -245,12 +245,20 @@ function PaymentPage() {
     });
     return res.data;
   };
-const createSubscriptionOnBackend = async (donorId, amount) => {
-  // ensure integer rupees
-  const intAmount = Math.round(Number(amount));
+// const createSubscriptionOnBackend = async (donorId, amount) => {
+//   // ensure integer rupees
+//   const intAmount = Math.round(Number(amount));
+//   const res = await axios.post(`${API_BASE}/payment/create-subscription`, {
+//     donorId,
+//     amount: intAmount,
+//   });
+//   return res.data;
+// };
+const createSubscriptionOnBackend = async (donorId, amount, starterAmount) => {
   const res = await axios.post(`${API_BASE}/payment/create-subscription`, {
     donorId,
-    amount: intAmount,
+    amount: Number(amount),
+    starterAmount: Number(starterAmount) || 10,  // ⚡ send 5/10/15
   });
   return res.data;
 };
@@ -320,41 +328,41 @@ donorId: order.donorId
       setStatus("❌ " + err.message);
     }
   };
-  const startSubscription = async () => {
-  try {
-    setStatus("Creating donor record...");
+//   const startSubscription = async () => {
+//   try {
+//     setStatus("Creating donor record...");
 
-    const donorRes = await axios.post(`${API_BASE}/payment/create-donor-record`, {
-      ...donationData,
-    });
+//     const donorRes = await axios.post(`${API_BASE}/payment/create-donor-record`, {
+//       ...donationData,
+//     });
 
-    const donorId = donorRes.data.donorId;
+//     const donorId = donorRes.data.donorId;
 
-    setStatus("Creating subscription...");
+//     setStatus("Creating subscription...");
 
-   const subRes = await createSubscriptionOnBackend(donorId, donationData.amount);
-    if (!subRes.success) {
-      setStatus("Subscription creation failed");
-      return;
-    }
-const options = {
-  key: subRes.keyId,
-  subscription_id: subRes.subscription_id,
-  name: "Feed The Hunger Seva Sangha Foundation",
-  description: "Monthly Donation Subscription",
-  prefill: {
-    name: `${donationData.firstName} ${donationData.lastName}`,
-    email: donationData.email,
-    contact: donationData.mobile,
-  },
-  handler: function (response) {
-    navigate("/thankyou", {
-      state: { ...donationData, subscriptionId: subRes.subscription_id ,  donorId: donorId               
-}
-    });
-  },
-  theme: { color: "#0d6efd" },
-};
+//    const subRes = await createSubscriptionOnBackend(donorId, donationData.amount);
+//     if (!subRes.success) {
+//       setStatus("Subscription creation failed");
+//       return;
+//     }
+// const options = {
+//   key: subRes.keyId,
+//   subscription_id: subRes.subscription_id,
+//   name: "Feed The Hunger Seva Sangha Foundation",
+//   description: "Monthly Donation Subscription",
+//   prefill: {
+//     name: `${donationData.firstName} ${donationData.lastName}`,
+//     email: donationData.email,
+//     contact: donationData.mobile,
+//   },
+//   handler: function (response) {
+//     navigate("/thankyou", {
+//       state: { ...donationData, subscriptionId: subRes.subscription_id ,  donorId: donorId               
+// }
+//     });
+//   },
+//   theme: { color: "#0d6efd" },
+// };
 
     // const options = {
     //   key: subRes.data.keyId,
@@ -372,19 +380,110 @@ const options = {
     //   theme: { color: "#0d6efd" },
     // };
 
+//     const rz = new window.Razorpay(options);
+//     rz.open();
+
+//   } catch (err) {
+//     console.error(err);
+//     setStatus("Subscription error: " + err.message);
+//   }
+// };
+const startSubscription = async () => {
+  try {
+    setStatus("🟡 Creating donor record...");
+
+    // 1️⃣ Create donor record in backend
+    const donorRes = await axios.post(`${API_BASE}/payment/create-donor-record`, {
+      ...donationData,
+    });
+
+    const donorId = donorRes.data.donorId;
+    console.log("🟢 Donor created:", donorId);
+
+    setStatus("🟡 Creating subscription (mandate)…");
+
+    // 2️⃣ Create subscription (MANDATE) in backend
+    const subRes = await axios.post(`${API_BASE}/payment/create-subscription`, {
+      donorId,
+      amount: Number(donationData.amount),
+      starterAmount: donationData.starterAmount || 10, // 5/10/15 first debit
+    });
+
+    console.log("🟢 Subscription API response:", subRes.data);
+
+    if (!subRes.data.success) {
+      setStatus("❌ Failed to create subscription");
+      return;
+    }
+
+    const subscriptionId = subRes.data.subscription_id;
+
+    // 3️⃣ Razorpay Checkout for E-mandate
+    const options = {
+      key: subRes.data.keyId,
+      subscription_id: subscriptionId,
+      name: "Feed The Hunger Seva Sangha Foundation",
+      description: "Monthly Donation Subscription",
+      prefill: {
+        name: `${donationData.firstName} ${donationData.lastName}`,
+        email: donationData.email,
+        contact: donationData.mobile,
+      },
+
+      handler: async function (response) {
+        console.log("🟢 Razorpay Subscription Response:", response);
+
+        // 4️⃣ VERIFY subscription signature
+        const verifyRes = await axios.post(`${API_BASE}/payment/verify-subscription`, {
+          razorpay_subscription_id: response.razorpay_subscription_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+        });
+
+        if (!verifyRes.data.success) {
+          setStatus("❌ Subscription verification failed!");
+          return;
+        }
+
+        setStatus("🟢 Subscription Activated Successfully!");
+
+        // 5️⃣ Navigate
+        navigate("/thankyou", {
+          state: {
+            ...donationData,
+            subscriptionId: subscriptionId,
+            donorId: donorId,
+          },
+        });
+      },
+
+      modal: {
+        ondismiss: function () {
+          setStatus("❌ Subscription setup cancelled");
+        },
+      },
+
+      theme: { color: "#0d6efd" },
+    };
+
+    console.log("🟡 Opening Razorpay Subscription Checkout:", options);
+
     const rz = new window.Razorpay(options);
     rz.open();
 
   } catch (err) {
-    console.error(err);
+    console.error("❌ Subscription error:", err);
     setStatus("Subscription error: " + err.message);
   }
 };
 
- const isSubscription =
-    donationData.frequency === "monthly" &&
-    donationData.paymentMode === "E-Mandate"||
-     donationData.paymentMode === "UPI";
+ // const isSubscription =
+ //    donationData.frequency === "monthly" &&
+ //    donationData.paymentMode === "E-Mandate"||
+ //     donationData.paymentMode === "UPI";
+const isSubscription =
+  donationData.frequency === "monthly" &&
+  (donationData.paymentMode === "E-Mandate" || donationData.paymentMode === "UPI");
 
   const isOneTime =
     donationData.frequency === "onetime" 
@@ -431,6 +530,7 @@ const options = {
 }
 
 export default PaymentPage;
+
 
 
 
