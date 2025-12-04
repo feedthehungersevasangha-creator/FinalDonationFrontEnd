@@ -251,7 +251,7 @@ function DonationModal() {
                 <option value="">Please Select Donation Mode</option>
                 <option value="E-Mandate">E-Mandate 
                 </option>
-                {/* <option value="UPI">UPI</option> */}
+                 <option value="UPI">UPI</option> 
               </select>
               {errors.paymentMode && <p className="error">{errors.paymentMode.message}</p>}
             </div>
@@ -418,6 +418,7 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
 
 
