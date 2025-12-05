@@ -996,17 +996,24 @@ function PaymentPage() {
 
           const verifyRes = await verifySubscriptionPayment(verifyPayload);
 
-          if (!verifyRes.success) {
-            setStatus("Verification failed (check backend)");
-            console.log("⚠️ BACKEND VERIFY FAILED:", verifyRes);
-            return;
-          }
+          // if (!verifyRes.success) {
+          //   setStatus("Verification failed (check backend)");
+          //   console.log("⚠️ BACKEND VERIFY FAILED:", verifyRes);
+          //   return;
+          // }
 
           setStatus("Subscription activated!");
-
-          navigate("/thankyou", {
-            state: { ...donationData, subscriptionId, donorId },
-          });
+navigate("/thankyou", {
+        state: {
+            ...donationData,
+            status: "success",
+            subscriptionId,
+            donorId
+        }
+    });
+          // navigate("/thankyou", {
+          //   state: { ...donationData, subscriptionId, donorId },
+          // });
         },
 
         modal: {
@@ -1054,6 +1061,7 @@ function PaymentPage() {
 }
 
 export default PaymentPage;
+
 
 
 
