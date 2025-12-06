@@ -76,21 +76,97 @@
 // }
 
 // export default ThankYouPage;
+// import React from "react";
+// import { useLocation, useNavigate } from "react-router-dom";
+// import config from "../config";
+// const API_BASE = `${config.API_URL}`;
+
+// function ThankYouPage() {
+//   const { state } = useLocation();
+//   const navigate = useNavigate();
+
+//   const donorId = state?.donorId; // ⭐ GET DONOR ID
+//   const isSubscription = state?.subscriptionId ? true : false;
+
+//   const downloadReceipt = () => {
+//     if (!donorId) return alert("Receipt unavailable");
+//     window.open(`${API_BASE}/donors/download/${donorId}`, "_blank");
+//   };
+
+//   return (
+//     <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
+//       <div className="bg-white p-8 rounded-xl shadow-md text-center max-w-md w-full">
+//         <h2 className="text-2xl font-bold mb-4 text-green-600">
+//           🎉 Thank You for Your Kind Support!
+//         </h2>
+
+//         <p className="text-gray-700 mb-2 text-lg">
+//           Your {isSubscription ? "monthly" : "one-time"} donation of  
+//           <span className="font-bold"> ₹{state?.amount}</span>  
+//           has been received successfully.
+//         </p>
+
+//         {/* Show ID */}
+//         {isSubscription ? (
+//           <p className="text-sm text-gray-500 mb-2">
+//             Subscription ID: <b>{state.subscriptionId}</b>
+//           </p>
+//         ) : (
+//           <p className="text-sm text-gray-500 mb-2">
+//             Payment ID: <b>{state.paymentId}</b>
+//           </p>
+//         )}
+
+//         {/* ⭐ DOWNLOAD RECEIPT BUTTON */}
+//         <button
+//           onClick={downloadReceipt}
+//           className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 mb-4"
+//         >
+//           Download Receipt
+//         </button>
+
+//         <br />
+
+//         {/* Back Home */}
+//         <button
+//           onClick={() => navigate("/")}
+//           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+//         >
+//           Go Home
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default ThankYouPage;
+
+// //--------------------------------------------------------------------------------------------------------
+
+
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import config from "../config";
+
 const API_BASE = `${config.API_URL}`;
 
 function ThankYouPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const { donorId } = useParams();   // ✅ NOW PERSISTENT
 
-  const donorId = state?.donorId; // ⭐ GET DONOR ID
-  const isSubscription = state?.subscriptionId ? true : false;
+  const isSubscription = !!state?.subscriptionId;
 
   const downloadReceipt = () => {
-    if (!donorId) return alert("Receipt unavailable");
-    window.open(`${API_BASE}/donors/download/${donorId}`, "_blank");
+    if (!donorId) {
+      alert("Receipt unavailable");
+      return;
+    }
+
+    window.open(
+      `${API_BASE}/api/donors/download/${donorId}`,
+      "_blank"
+    );
   };
 
   return (
@@ -101,23 +177,22 @@ function ThankYouPage() {
         </h2>
 
         <p className="text-gray-700 mb-2 text-lg">
-          Your {isSubscription ? "monthly" : "one-time"} donation of  
-          <span className="font-bold"> ₹{state?.amount}</span>  
+          Your {isSubscription ? "monthly" : "one-time"} donation of
+          <span className="font-bold"> ₹{state?.amount}</span>
           has been received successfully.
         </p>
 
-        {/* Show ID */}
         {isSubscription ? (
           <p className="text-sm text-gray-500 mb-2">
-            Subscription ID: <b>{state.subscriptionId}</b>
+            Subscription ID: <b>{state?.subscriptionId}</b>
           </p>
         ) : (
           <p className="text-sm text-gray-500 mb-2">
-            Payment ID: <b>{state.paymentId}</b>
+            Payment ID: <b>{state?.paymentId}</b>
           </p>
         )}
 
-        {/* ⭐ DOWNLOAD RECEIPT BUTTON */}
+        {/* ✅ DOWNLOAD RECEIPT */}
         <button
           onClick={downloadReceipt}
           className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 mb-4"
@@ -127,7 +202,6 @@ function ThankYouPage() {
 
         <br />
 
-        {/* Back Home */}
         <button
           onClick={() => navigate("/")}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
@@ -140,7 +214,4 @@ function ThankYouPage() {
 }
 
 export default ThankYouPage;
-
-//--------------------------------------------------------------------------------------------------------
-
 
