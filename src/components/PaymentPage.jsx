@@ -1062,41 +1062,321 @@
 
 // export default PaymentPage;
 // ------------------------------------------------------------------------------------------
+// import React, { useState, useEffect } from "react";
+// import axios from "axios";
+// import { useLocation, useNavigate } from "react-router-dom";
+// import config from "../config";
+
+// const API_BASE = `${config.API_URL}`;
+
+// function PaymentPage() {
+//   const { state: donationData } = useLocation();
+//   const navigate = useNavigate();
+//   const [status, setStatus] = useState("");
+
+//   // Log Razorpay events (debug)
+//   useEffect(() => {
+//     const listener = (e) => console.log("📢 RZP:", e.detail);
+//     window.addEventListener("rzp-log", listener);
+//     return () => window.removeEventListener("rzp-log", listener);
+//   }, []);
+
+//   // Load Razorpay script once
+//   useEffect(() => {
+//     if (!donationData) {
+//       navigate("/");
+//       return;
+//     }
+
+//     if (!window.Razorpay) {
+//       const script = document.createElement("script");
+//       script.src = "https://checkout.razorpay.com/v1/checkout.js";
+//       script.onload = () => console.log("Razorpay loaded");
+//       document.body.appendChild(script);
+//     }
+//   }, [donationData, navigate]);
+
+//   // ------------------ API Calls -------------------
+//   const createOrderOnBackend = async () =>
+//     (await axios.post(`${API_BASE}/payment/create-order`, donationData)).data;
+
+//   const createDonor = async () =>
+//     (await axios.post(`${API_BASE}/payment/create-donor-record`, donationData))
+//       .data;
+
+//   const createSubscription = async (donorId) =>
+//     (
+//       await axios.post(`${API_BASE}/payment/create-subscription`, {
+//         donorId,
+//         amount: Number(donationData.amount),
+//         starterAmount: donationData.starterAmount || 10,
+//       })
+//     ).data;
+
+//   const verifyOrderPayment = async (payload) =>
+//     (await axios.post(`${API_BASE}/payment/verify`, payload)).data;
+
+//   const verifySubscriptionPayment = async (payload) =>
+//     (
+//       await axios.post(`${API_BASE}/payment/verify-subscription`, payload)
+//     ).data;
+
+//   // --------------------------------------------------------------
+//   // ONE TIME PAYMENT
+//   // --------------------------------------------------------------
+//   const startPayment = async () => {
+//     try {
+//       setStatus("Creating order...");
+//       const order = await createOrderOnBackend();
+//       console.log("Created order from backend:", order);
+
+//       const options = {
+//         key: order.keyId,
+//         amount: order.amount,
+//         currency: "INR",
+//         order_id: order.id,
+
+//         name: "Feed The Hunger Seva Sangha Foundation",
+//         description: "Donation Payment",
+
+//         prefill: {
+//           name: `${donationData.firstName} ${donationData.lastName}`,
+//           email: donationData.email,
+//           contact: donationData.mobile,
+//         },
+
+//         handler: async (response) => {
+//           console.log("🟢 ORDER PAYMENT RESPONSE:", response);
+
+//           const verifyRes = await verifyOrderPayment({
+//             razorpay_order_id: response.razorpay_order_id,
+//             razorpay_payment_id: response.razorpay_payment_id,
+//             razorpay_signature: response.razorpay_signature,
+//           });
+
+//           console.log("VERIFY ORDER RESULT:", verifyRes);
+
+//           if (verifyRes.success) {
+//             setStatus("Payment successful!");
+//             navigate("/thankyou", {
+//               state: {
+//                 ...donationData,
+//                 paymentId: response.razorpay_payment_id,
+//                 status: "success",
+//               },
+//             });
+//           } else {
+//             setStatus("Verification failed!");
+//           }
+//         },
+
+//         modal: {
+//           ondismiss: () => setStatus("Payment closed ❌"),
+//         },
+
+//         theme: { color: "#0d6efd" },
+//       };
+
+//       new window.Razorpay(options).open();
+//     } catch (err) {
+//       console.error(err);
+//       setStatus("Error: " + err.message);
+//     }
+//   };
+
+//   // --------------------------------------------------------------
+//   // SUBSCRIPTION / MANDATE  (CARD / NETBANKING)
+//   // --------------------------------------------------------------
+//   const startSubscription = async () => {
+//     try {
+//       setStatus("Creating donor...");
+//       const donor = await createDonor();
+//       const donorId = donor.donorId;
+//       console.log("Created donor:", donor);
+
+//       setStatus("Creating subscription...");
+//       const subRes = await createSubscription(donorId);
+//       console.log("Created subscription:", subRes);
+
+//       if (!subRes.success) {
+//         setStatus("Subscription creation failed");
+//         return;
+//       }
+
+//       const subscriptionId = subRes.subscription_id;
+
+//       const options = {
+//         key: subRes.keyId,
+//         subscription_id: subscriptionId,
+
+//         name: "Feed The Hunger Seva Sangha Foundation",
+//         description: "Monthly Donation Subscription",
+
+//         prefill: {
+//           name: `${donationData.firstName} ${donationData.lastName}`,
+//           email: donationData.email,
+//           contact: donationData.mobile,
+//         },
+
+//         handler: async (response) => {
+//           console.log("🟢 SUBSCRIPTION RESPONSE:", response);
+
+//           // For card/netbanking subscription, payment_id MUST be present
+//           const verifyPayload = {
+//             razorpay_subscription_id: response.razorpay_subscription_id,
+//             razorpay_signature: response.razorpay_signature,
+//             razorpay_payment_id: response.razorpay_payment_id,
+//           };
+
+//           console.log("📤 VERIFY PAYLOAD (SUBSCRIPTION):", verifyPayload);
+
+//           const verifyRes = await verifySubscriptionPayment(verifyPayload);
+//           console.log("VERIFY SUBSCRIPTION RESULT:", verifyRes);
+
+//           if (!verifyRes.success) {
+//             setStatus("Verification failed (check backend logs)");
+//             return;
+//           }
+
+//           setStatus("Subscription activated!");
+//           navigate("/thankyou", {
+//             state: {
+//               ...donationData,
+//               status: "success",
+//               subscriptionId,
+//               donorId,
+//             },
+//           });
+//         },
+
+//         modal: {
+//           ondismiss: () => setStatus("Mandate cancelled ❌"),
+//         },
+
+//         theme: { color: "#0d6efd" },
+//       };
+
+//       new window.Razorpay(options).open();
+//     } catch (err) {
+//       console.error(err);
+//       setStatus("Error: " + err.message);
+//     }
+//   };
+
+//   // --------------------------------------------------------------
+//   return (
+//     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+//       <div className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-md text-center">
+//         <h2 className="text-xl font-bold mb-4">
+//           Razorpay Donation (India Only)
+//         </h2>
+
+//         {donationData?.frequency === "onetime" && (
+//           <button
+//             onClick={startPayment}
+//             className="bg-yellow-600 text-white px-6 py-3 rounded-lg w-full"
+//           >
+//             Pay Once ₹{donationData.amount}
+//           </button>
+//         )}
+
+//         {donationData?.frequency === "monthly" && (
+//           <button
+//             onClick={startSubscription}
+//             className="bg-blue-600 text-white px-6 py-3 rounded-lg w-full"
+//           >
+//             Setup Monthly e-Mandate ₹{donationData.amount}
+//           </button>
+//         )}
+
+//         <p className="mt-4 text-gray-700 text-sm">{status}</p>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default PaymentPage;
+
+
+// ----------------------------------------------------------------------------------------------
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import config from "../config";
 
 const API_BASE = `${config.API_URL}`;
+const PAYMENT_TIMEOUT = 600; // 10 minutes (in seconds)
 
 function PaymentPage() {
   const { state: donationData } = useLocation();
   const navigate = useNavigate();
+
   const [status, setStatus] = useState("");
+  const [timeLeft, setTimeLeft] = useState(PAYMENT_TIMEOUT);
+  const [expired, setExpired] = useState(false);
 
-  // Log Razorpay events (debug)
-  useEffect(() => {
-    const listener = (e) => console.log("📢 RZP:", e.detail);
-    window.addEventListener("rzp-log", listener);
-    return () => window.removeEventListener("rzp-log", listener);
-  }, []);
-
-  // Load Razorpay script once
+  // --------------------------------------------------
+  // 🛑 BLOCK INVALID ENTRY / DOUBLE PAYMENT
+  // --------------------------------------------------
   useEffect(() => {
     if (!donationData) {
       navigate("/");
       return;
     }
 
+    if (sessionStorage.getItem("paymentStarted")) {
+      setExpired(true);
+      setStatus("Payment already attempted. Please refresh to retry.");
+      return;
+    }
+
+    sessionStorage.setItem("paymentStarted", "true");
+
+    return () => {
+      sessionStorage.removeItem("paymentStarted");
+    };
+  }, [donationData, navigate]);
+
+  // --------------------------------------------------
+  // ⏱ 10-MINUTE PAYMENT TIMER
+  // --------------------------------------------------
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setExpired(true);
+          setStatus("Session expired. Please refresh the page.");
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatTime = (sec) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
+  // --------------------------------------------------
+  // 🔧 Load Razorpay Script
+  // --------------------------------------------------
+  useEffect(() => {
     if (!window.Razorpay) {
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.onload = () => console.log("Razorpay loaded");
+      script.onload = () => console.log("✅ Razorpay loaded");
       document.body.appendChild(script);
     }
-  }, [donationData, navigate]);
+  }, []);
 
-  // ------------------ API Calls -------------------
+  // --------------------------------------------------
+  // API CALLS
+  // --------------------------------------------------
   const createOrderOnBackend = async () =>
     (await axios.post(`${API_BASE}/payment/create-order`, donationData)).data;
 
@@ -1121,14 +1401,15 @@ function PaymentPage() {
       await axios.post(`${API_BASE}/payment/verify-subscription`, payload)
     ).data;
 
-  // --------------------------------------------------------------
-  // ONE TIME PAYMENT
-  // --------------------------------------------------------------
+  // --------------------------------------------------
+  // 🟡 ONE-TIME PAYMENT
+  // --------------------------------------------------
   const startPayment = async () => {
+    if (expired) return;
+
     try {
       setStatus("Creating order...");
       const order = await createOrderOnBackend();
-      console.log("Created order from backend:", order);
 
       const options = {
         key: order.keyId,
@@ -1146,7 +1427,7 @@ function PaymentPage() {
         },
 
         handler: async (response) => {
-          console.log("🟢 ORDER PAYMENT RESPONSE:", response);
+          setStatus("Verifying payment...");
 
           const verifyRes = await verifyOrderPayment({
             razorpay_order_id: response.razorpay_order_id,
@@ -1154,24 +1435,22 @@ function PaymentPage() {
             razorpay_signature: response.razorpay_signature,
           });
 
-          console.log("VERIFY ORDER RESULT:", verifyRes);
-
           if (verifyRes.success) {
-            setStatus("Payment successful!");
+            sessionStorage.removeItem("paymentStarted");
             navigate("/thankyou", {
               state: {
                 ...donationData,
-                paymentId: response.razorpay_payment_id,
                 status: "success",
+                paymentId: response.razorpay_payment_id,
               },
             });
           } else {
-            setStatus("Verification failed!");
+            setStatus("Payment verification failed.");
           }
         },
 
         modal: {
-          ondismiss: () => setStatus("Payment closed ❌"),
+          ondismiss: () => setStatus("Payment cancelled ❌"),
         },
 
         theme: { color: "#0d6efd" },
@@ -1180,37 +1459,34 @@ function PaymentPage() {
       new window.Razorpay(options).open();
     } catch (err) {
       console.error(err);
-      setStatus("Error: " + err.message);
+      setStatus("Error occurred. Try again.");
     }
   };
 
-  // --------------------------------------------------------------
-  // SUBSCRIPTION / MANDATE  (CARD / NETBANKING)
-  // --------------------------------------------------------------
+  // --------------------------------------------------
+  // 🔵 SUBSCRIPTION / e-MANDATE
+  // --------------------------------------------------
   const startSubscription = async () => {
+    if (expired) return;
+
     try {
       setStatus("Creating donor...");
       const donor = await createDonor();
-      const donorId = donor.donorId;
-      console.log("Created donor:", donor);
 
       setStatus("Creating subscription...");
-      const subRes = await createSubscription(donorId);
-      console.log("Created subscription:", subRes);
+      const subRes = await createSubscription(donor.donorId);
 
       if (!subRes.success) {
         setStatus("Subscription creation failed");
         return;
       }
 
-      const subscriptionId = subRes.subscription_id;
-
       const options = {
         key: subRes.keyId,
-        subscription_id: subscriptionId,
+        subscription_id: subRes.subscription_id,
 
         name: "Feed The Hunger Seva Sangha Foundation",
-        description: "Monthly Donation Subscription",
+        description: "Monthly Donation (e-Mandate)",
 
         prefill: {
           name: `${donationData.firstName} ${donationData.lastName}`,
@@ -1219,34 +1495,22 @@ function PaymentPage() {
         },
 
         handler: async (response) => {
-          console.log("🟢 SUBSCRIPTION RESPONSE:", response);
+          setStatus("Verifying mandate...");
 
-          // For card/netbanking subscription, payment_id MUST be present
-          const verifyPayload = {
+          const verifyRes = await verifySubscriptionPayment({
             razorpay_subscription_id: response.razorpay_subscription_id,
-            razorpay_signature: response.razorpay_signature,
             razorpay_payment_id: response.razorpay_payment_id,
-          };
-
-          console.log("📤 VERIFY PAYLOAD (SUBSCRIPTION):", verifyPayload);
-
-          const verifyRes = await verifySubscriptionPayment(verifyPayload);
-          console.log("VERIFY SUBSCRIPTION RESULT:", verifyRes);
-
-          if (!verifyRes.success) {
-            setStatus("Verification failed (check backend logs)");
-            return;
-          }
-
-          setStatus("Subscription activated!");
-          navigate("/thankyou", {
-            state: {
-              ...donationData,
-              status: "success",
-              subscriptionId,
-              donorId,
-            },
+            razorpay_signature: response.razorpay_signature,
           });
+
+          if (verifyRes.success) {
+            sessionStorage.removeItem("paymentStarted");
+            navigate("/thankyou", {
+              state: { ...donationData, status: "success" },
+            });
+          } else {
+            setStatus("Subscription verification failed.");
+          }
         },
 
         modal: {
@@ -1259,44 +1523,62 @@ function PaymentPage() {
       new window.Razorpay(options).open();
     } catch (err) {
       console.error(err);
-      setStatus("Error: " + err.message);
+      setStatus("Error occurred. Try again.");
     }
   };
 
-  // --------------------------------------------------------------
+  // --------------------------------------------------
+  // UI
+  // --------------------------------------------------
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-md text-center">
-        <h2 className="text-xl font-bold mb-4">
+        <h2 className="text-xl font-bold mb-2">
           Razorpay Donation (India Only)
         </h2>
 
-        {donationData?.frequency === "onetime" && (
+        <p className="text-sm text-gray-600 mb-4">
+          Time left:{" "}
+          <span className="font-semibold text-red-600">
+            {formatTime(timeLeft)}
+          </span>
+        </p>
+
+        {donationData.frequency === "onetime" && (
           <button
             onClick={startPayment}
-            className="bg-yellow-600 text-white px-6 py-3 rounded-lg w-full"
+            disabled={expired}
+            className={`w-full py-3 rounded-lg ${
+              expired
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-yellow-600 text-white"
+            }`}
           >
             Pay Once ₹{donationData.amount}
           </button>
         )}
 
-        {donationData?.frequency === "monthly" && (
+        {donationData.frequency === "monthly" && (
           <button
             onClick={startSubscription}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg w-full"
+            disabled={expired}
+            className={`w-full py-3 rounded-lg ${
+              expired
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 text-white"
+            }`}
           >
             Setup Monthly e-Mandate ₹{donationData.amount}
           </button>
         )}
 
-        <p className="mt-4 text-gray-700 text-sm">{status}</p>
+        <p className="mt-4 text-sm text-gray-700">{status}</p>
       </div>
     </div>
   );
 }
 
 export default PaymentPage;
-
 
 
 
