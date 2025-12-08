@@ -1477,7 +1477,6 @@ function PaymentPage() {
 console.log("✅ Donor created:", donor);
       setStatus("Creating subscription...");
       const subRes = await createSubscription(donor.donorId);
-        const subRes = await createSubscription(donor.donorId);
 console.log("✅ Subscription response:", subRes);
 
       if (!subRes.success) {
@@ -1595,6 +1594,7 @@ console.log("📤 Mandate verify payload:", payload);
 }
 
 export default PaymentPage;
+
 
 
 
