@@ -1508,7 +1508,6 @@ console.log("✅ Subscription response:", subRes);
           });
 console.log("📤 Mandate verify payload:", payload);
 
-  const verifyRes = await verifySubscriptionPayment(payload);
 
   console.log("📥 Mandate verify response:", verifyRes);
           if (verifyRes.success) {
@@ -1594,6 +1593,7 @@ console.log("📤 Mandate verify payload:", payload);
 }
 
 export default PaymentPage;
+
 
 
 
