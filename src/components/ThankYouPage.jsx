@@ -158,7 +158,10 @@ function ThankYouPage() {
   const isSubscription = !!state?.subscriptionId;
 
   const downloadReceipt = () => {
+    console.log("📄 Download receipt clicked");
+  console.log("➡️ donorId used for download:", donorId);
     if (!donorId) {
+          console.error("❌ Donor ID missing");
       alert("Receipt unavailable");
       return;
     }
@@ -214,4 +217,5 @@ function ThankYouPage() {
 }
 
 export default ThankYouPage;
+
 
