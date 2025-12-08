@@ -1437,8 +1437,9 @@ function PaymentPage() {
           });
 
           if (verifyRes.success) {
+            console.log("✅ Navigating to ThankYou with donorId:", verifyRes.donorId);
             sessionStorage.removeItem("paymentStarted");
-            navigate("/thankyou", {
+            navigate(`/thankyou/${verifyRes.donorId}`, {
               state: {
                 ...donationData,
                 status: "success",
@@ -1473,9 +1474,11 @@ function PaymentPage() {
     try {
       setStatus("Creating donor...");
       const donor = await createDonor();
-
+console.log("✅ Donor created:", donor);
       setStatus("Creating subscription...");
       const subRes = await createSubscription(donor.donorId);
+        const subRes = await createSubscription(donor.donorId);
+console.log("✅ Subscription response:", subRes);
 
       if (!subRes.success) {
         setStatus("Subscription creation failed");
@@ -1496,6 +1499,7 @@ function PaymentPage() {
         },
 
         handler: async (response) => {
+              console.log("✅ Razorpay mandate response:", response);
           setStatus("Verifying mandate...");
 
           const verifyRes = await verifySubscriptionPayment({
@@ -1503,11 +1507,22 @@ function PaymentPage() {
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_signature: response.razorpay_signature,
           });
+console.log("📤 Mandate verify payload:", payload);
 
+  const verifyRes = await verifySubscriptionPayment(payload);
+
+  console.log("📥 Mandate verify response:", verifyRes);
           if (verifyRes.success) {
+              console.log("✅ Navigating to ThankYou with donorId:", donor.donorId);
+
+    sessionStorage.removeItem("paymentStarted");
             sessionStorage.removeItem("paymentStarted");
-            navigate("/thankyou", {
-              state: { ...donationData, status: "success" },
+            navigate(`/thankyou/${donor.donorId}`, {
+              state: {
+        amount: donationData.amount,
+        subscriptionId: response.razorpay_subscription_id,
+        frequency: "monthly",
+      },
             });
           } else {
             setStatus("Subscription verification failed.");
@@ -1580,6 +1595,7 @@ function PaymentPage() {
 }
 
 export default PaymentPage;
+
 
 
 
