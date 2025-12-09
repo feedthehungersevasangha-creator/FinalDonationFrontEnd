@@ -1569,26 +1569,44 @@ function PaymentPage() {
         email: donationData.email,
         contact: donationData.mobile,
       },
+        handler: () => {
+  console.log("✅ Razorpay mandate initiated");
 
-      handler: (response) => {
-        console.log("✅ Razorpay mandate initiated:", response);
+  sessionStorage.removeItem("paymentStarted");
 
-        // ✅ DO NOT VERIFY HERE
-        // ✅ Webhook will update mandate status
+  navigate(`/thankyou/${donor.donorId}`, {
+    replace: true,
+    state: {
+      donorId: donor.donorId,
+      amount: donationData.amount,
+      frequency: "monthly",
+      subscriptionId: subRes.subscription_id,
+      info:
+        "Your mandate request has been submitted. Receipt will be available after confirmation.",
+    },
+  });
+},
 
-        sessionStorage.removeItem("paymentStarted");
 
-    navigate(`/thankyou/${donor.donorId}`, {
-  state: {
-    donorId: donor.donorId,
-    amount: donationData.amount,
-    frequency: "monthly",
-    subscriptionId: response.razorpay_subscription_id,
-    info:
-      "Your mandate request has been submitted. Receipt will be available after confirmation.",
-  },
-});
-      },
+//       handler: (response) => {
+//         console.log("✅ Razorpay mandate initiated:", response);
+
+//         // ✅ DO NOT VERIFY HERE
+//         // ✅ Webhook will update mandate status
+
+//         sessionStorage.removeItem("paymentStarted");
+
+//     navigate(`/thankyou/${donor.donorId}`, {
+//   state: {
+//     donorId: donor.donorId,
+//     amount: donationData.amount,
+//     frequency: "monthly",
+//     subscriptionId: response.razorpay_subscription_id,
+//     info:
+//       "Your mandate request has been submitted. Receipt will be available after confirmation.",
+//   },
+// });
+//       },
 
       modal: {
         ondismiss: () => setStatus("Mandate setup cancelled ❌"),
@@ -1657,6 +1675,7 @@ function PaymentPage() {
 }
 
 export default PaymentPage;
+
 
 
 
