@@ -1540,7 +1540,89 @@ function PaymentPage() {
 //       setStatus("Error occurred. Try again.");
 //     }
 //   };
-    const startSubscription = async () => {
+//     const startSubscription = async () => {
+//   if (expired) return;
+
+//   try {
+//     setStatus("Creating donor...");
+//     const donor = await createDonor();
+//     console.log("✅ Donor created:", donor);
+
+//     setStatus("Creating subscription...");
+//     const subRes = await createSubscription(donor.donorId);
+//     console.log("✅ Subscription created:", subRes);
+
+//     if (!subRes.success) {
+//       setStatus("Subscription creation failed");
+//       return;
+//     }
+
+//     const options = {
+//       key: subRes.keyId,
+//       subscription_id: subRes.subscription_id,
+
+//       name: "Feed The Hunger Seva Sangha Foundation",
+//       description: "Monthly Donation (e-Mandate)",
+
+//       prefill: {
+//         name: `${donationData.firstName} ${donationData.lastName}`,
+//         email: donationData.email,
+//         contact: donationData.mobile,
+//       },
+//         handler: () => {
+//   console.log("✅ Razorpay mandate initiated");
+
+//   sessionStorage.removeItem("paymentStarted");
+
+//   navigate(`/thankyou/${donor.donorId}`, {
+//     replace: true,
+//     state: {
+//       donorId: donor.donorId,
+//       amount: donationData.amount,
+//       frequency: "monthly",
+//       subscriptionId: subRes.subscription_id,
+//       info:
+//         "Your mandate request has been submitted. Receipt will be available after confirmation.",
+//     },
+//   });
+// },
+
+
+// //       handler: (response) => {
+// //         console.log("✅ Razorpay mandate initiated:", response);
+
+// //         // ✅ DO NOT VERIFY HERE
+// //         // ✅ Webhook will update mandate status
+
+// //         sessionStorage.removeItem("paymentStarted");
+
+// //     navigate(`/thankyou/${donor.donorId}`, {
+// //   state: {
+// //     donorId: donor.donorId,
+// //     amount: donationData.amount,
+// //     frequency: "monthly",
+// //     subscriptionId: response.razorpay_subscription_id,
+// //     info:
+// //       "Your mandate request has been submitted. Receipt will be available after confirmation.",
+// //   },
+// // });
+// //       },
+
+//       modal: {
+//         ondismiss: () => setStatus("Mandate setup cancelled ❌"),
+//       },
+
+//       theme: { color: "#0d6efd" },
+//     };
+
+//     new window.Razorpay(options).open();
+//   } catch (err) {
+//     console.error(err);
+//     setStatus("Error occurred. Try again.");
+//   }
+// };
+
+const startSubscription = async () => {
   if (expired) return;
 
   try {
@@ -1569,59 +1651,34 @@ function PaymentPage() {
         email: donationData.email,
         contact: donationData.mobile,
       },
-        handler: () => {
-  console.log("✅ Razorpay mandate initiated");
-
-  sessionStorage.removeItem("paymentStarted");
-
-  navigate(`/thankyou/${donor.donorId}`, {
-    replace: true,
-    state: {
-      donorId: donor.donorId,
-      amount: donationData.amount,
-      frequency: "monthly",
-      subscriptionId: subRes.subscription_id,
-      info:
-        "Your mandate request has been submitted. Receipt will be available after confirmation.",
-    },
-  });
-},
-
-
-//       handler: (response) => {
-//         console.log("✅ Razorpay mandate initiated:", response);
-
-//         // ✅ DO NOT VERIFY HERE
-//         // ✅ Webhook will update mandate status
-
-//         sessionStorage.removeItem("paymentStarted");
-
-//     navigate(`/thankyou/${donor.donorId}`, {
-//   state: {
-//     donorId: donor.donorId,
-//     amount: donationData.amount,
-//     frequency: "monthly",
-//     subscriptionId: response.razorpay_subscription_id,
-//     info:
-//       "Your mandate request has been submitted. Receipt will be available after confirmation.",
-//   },
-// });
-//       },
 
       modal: {
-        ondismiss: () => setStatus("Mandate setup cancelled ❌"),
+        ondismiss: () => {
+          setStatus("Mandate setup cancelled ❌");
+          sessionStorage.removeItem("paymentStarted");
+        },
       },
 
       theme: { color: "#0d6efd" },
     };
 
-    new window.Razorpay(options).open();
+    // ✅ OPEN RAZORPAY
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+
+    // ✅ FORCE FULL PAGE REDIRECT (CRITICAL FIX)
+    setTimeout(() => {
+      sessionStorage.removeItem("paymentStarted");
+
+      window.location.href = `/thankyou/${donor.donorId}`;
+    }, 500); // small delay ensures checkout opens first
+
   } catch (err) {
     console.error(err);
     setStatus("Error occurred. Try again.");
+    sessionStorage.removeItem("paymentStarted");
   }
 };
-
 
   // --------------------------------------------------
   // UI
@@ -1675,6 +1732,7 @@ function PaymentPage() {
 }
 
 export default PaymentPage;
+
 
 
 
