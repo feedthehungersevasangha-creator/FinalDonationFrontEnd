@@ -144,6 +144,80 @@
 // //--------------------------------------------------------------------------------------------------------
 
 
+// import React from "react";
+// import { useLocation, useNavigate, useParams } from "react-router-dom";
+// import config from "../config";
+
+// const API_BASE = `${config.API_URL}`;
+
+// function ThankYouPage() {
+//   const { state } = useLocation();
+//   const navigate = useNavigate();
+//   const { donorId } = useParams();   // ✅ NOW PERSISTENT
+
+//   const isSubscription = !!state?.subscriptionId;
+
+//   const downloadReceipt = () => {
+//     console.log("📄 Download receipt clicked");
+//   console.log("➡️ donorId used for download:", donorId);
+//     if (!donorId) {
+//           console.error("❌ Donor ID missing");
+//       alert("Receipt unavailable");
+//       return;
+//     }
+
+//     window.open(
+//       `${API_BASE}/api/donors/download/${donorId}`,
+//       "_blank"
+//     );
+//   };
+
+//   return (
+//     <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
+//       <div className="bg-white p-8 rounded-xl shadow-md text-center max-w-md w-full">
+//         <h2 className="text-2xl font-bold mb-4 text-green-600">
+//           🎉 Thank You for Your Kind Support!
+//         </h2>
+
+//         <p className="text-gray-700 mb-2 text-lg">
+//           Your {isSubscription ? "monthly" : "one-time"} donation of
+//           <span className="font-bold"> ₹{state?.amount}</span>
+//           has been received successfully.
+//         </p>
+
+//         {isSubscription ? (
+//           <p className="text-sm text-gray-500 mb-2">
+//             Subscription ID: <b>{state?.subscriptionId}</b>
+//           </p>
+//         ) : (
+//           <p className="text-sm text-gray-500 mb-2">
+//             Payment ID: <b>{state?.paymentId}</b>
+//           </p>
+//         )}
+
+//         {/* ✅ DOWNLOAD RECEIPT */}
+//         <button
+//           onClick={downloadReceipt}
+//           className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 mb-4"
+//         >
+//           Download Receipt
+//         </button>
+
+//         <br />
+
+//         <button
+//           onClick={() => navigate("/")}
+//           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+//         >
+//           Go Home
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default ThankYouPage;
+
 import React from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import config from "../config";
@@ -153,16 +227,13 @@ const API_BASE = `${config.API_URL}`;
 function ThankYouPage() {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const { donorId } = useParams();   // ✅ NOW PERSISTENT
+  const { donorId } = useParams();
 
-  const isSubscription = !!state?.subscriptionId;
+  const isSubscription = state?.frequency === "monthly";
 
   const downloadReceipt = () => {
-    console.log("📄 Download receipt clicked");
-  console.log("➡️ donorId used for download:", donorId);
     if (!donorId) {
-          console.error("❌ Donor ID missing");
-      alert("Receipt unavailable");
+      alert("Receipt not yet available");
       return;
     }
 
@@ -175,33 +246,44 @@ function ThankYouPage() {
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
       <div className="bg-white p-8 rounded-xl shadow-md text-center max-w-md w-full">
+
         <h2 className="text-2xl font-bold mb-4 text-green-600">
-          🎉 Thank You for Your Kind Support!
+          🎉 Thank You for Your Support!
         </h2>
 
         <p className="text-gray-700 mb-2 text-lg">
-          Your {isSubscription ? "monthly" : "one-time"} donation of
+          {isSubscription ? "Monthly donation" : "One-time donation"} of
           <span className="font-bold"> ₹{state?.amount}</span>
-          has been received successfully.
         </p>
 
         {isSubscription ? (
-          <p className="text-sm text-gray-500 mb-2">
-            Subscription ID: <b>{state?.subscriptionId}</b>
-          </p>
+          <>
+            <p className="text-sm text-gray-500 mb-2">
+              Subscription ID:
+              <br />
+              <b>{state?.subscriptionId}</b>
+            </p>
+
+            <p className="text-sm text-orange-600 mb-4">
+              Mandate confirmation & receipts will be sent by email
+              once approved by your bank.
+            </p>
+          </>
         ) : (
           <p className="text-sm text-gray-500 mb-2">
             Payment ID: <b>{state?.paymentId}</b>
           </p>
         )}
 
-        {/* ✅ DOWNLOAD RECEIPT */}
-        <button
-          onClick={downloadReceipt}
-          className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 mb-4"
-        >
-          Download Receipt
-        </button>
+        {/* ✅ ONLY SHOW DOWNLOAD FOR ONE-TIME */}
+        {!isSubscription && (
+          <button
+            onClick={downloadReceipt}
+            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 mb-4"
+          >
+            Download Receipt
+          </button>
+        )}
 
         <br />
 
@@ -211,6 +293,7 @@ function ThankYouPage() {
         >
           Go Home
         </button>
+
       </div>
     </div>
   );
