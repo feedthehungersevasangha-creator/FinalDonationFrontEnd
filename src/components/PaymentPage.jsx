@@ -1468,78 +1468,140 @@ function PaymentPage() {
   // --------------------------------------------------
   // 🔵 SUBSCRIPTION / e-MANDATE
   // --------------------------------------------------
-  const startSubscription = async () => {
-    if (expired) return;
+//   const startSubscription = async () => {
+//     if (expired) return;
 
-    try {
-      setStatus("Creating donor...");
-      const donor = await createDonor();
-console.log("✅ Donor created:", donor);
-      setStatus("Creating subscription...");
-      const subRes = await createSubscription(donor.donorId);
-console.log("✅ Subscription response:", subRes);
+//     try {
+//       setStatus("Creating donor...");
+//       const donor = await createDonor();
+// console.log("✅ Donor created:", donor);
+//       setStatus("Creating subscription...");
+//       const subRes = await createSubscription(donor.donorId);
+// console.log("✅ Subscription response:", subRes);
 
-      if (!subRes.success) {
-        setStatus("Subscription creation failed");
-        return;
-      }
+//       if (!subRes.success) {
+//         setStatus("Subscription creation failed");
+//         return;
+//       }
 
-      const options = {
-        key: subRes.keyId,
-        subscription_id: subRes.subscription_id,
+//       const options = {
+//         key: subRes.keyId,
+//         subscription_id: subRes.subscription_id,
 
-        name: "Feed The Hunger Seva Sangha Foundation",
-        description: "Monthly Donation (e-Mandate)",
+//         name: "Feed The Hunger Seva Sangha Foundation",
+//         description: "Monthly Donation (e-Mandate)",
 
-        prefill: {
-          name: `${donationData.firstName} ${donationData.lastName}`,
-          email: donationData.email,
-          contact: donationData.mobile,
-        },
+//         prefill: {
+//           name: `${donationData.firstName} ${donationData.lastName}`,
+//           email: donationData.email,
+//           contact: donationData.mobile,
+//         },
 
-        handler: async (response) => {
-              console.log("✅ Razorpay mandate response:", response);
-          setStatus("Verifying mandate...");
+//         handler: async (response) => {
+//               console.log("✅ Razorpay mandate response:", response);
+//           setStatus("Verifying mandate...");
 
-          const verifyRes = await verifySubscriptionPayment({
-            razorpay_subscription_id: response.razorpay_subscription_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-          });
-console.log("📤 Mandate verify payload:", payload);
+//           const verifyRes = await verifySubscriptionPayment({
+//             razorpay_subscription_id: response.razorpay_subscription_id,
+//             razorpay_payment_id: response.razorpay_payment_id,
+//             razorpay_signature: response.razorpay_signature,
+//           });
+// console.log("📤 Mandate verify payload:", payload);
 
 
-  console.log("📥 Mandate verify response:", verifyRes);
-          if (verifyRes.success) {
-              console.log("✅ Navigating to ThankYou with donorId:", donor.donorId);
+//   console.log("📥 Mandate verify response:", verifyRes);
+//           if (verifyRes.success) {
+//               console.log("✅ Navigating to ThankYou with donorId:", donor.donorId);
 
-    sessionStorage.removeItem("paymentStarted");
-            sessionStorage.removeItem("paymentStarted");
-            navigate(`/thankyou/${donor.donorId}`, {
-              state: {
-        amount: donationData.amount,
-        subscriptionId: response.razorpay_subscription_id,
-        frequency: "monthly",
-      },
-            });
-          } else {
-            setStatus("Subscription verification failed.");
-          }
-        },
+//     sessionStorage.removeItem("paymentStarted");
+//             sessionStorage.removeItem("paymentStarted");
+//             navigate(`/thankyou/${donor.donorId}`, {
+//               state: {
+//         amount: donationData.amount,
+//         subscriptionId: response.razorpay_subscription_id,
+//         frequency: "monthly",
+//       },
+//             });
+//           } else {
+//             setStatus("Subscription verification failed.");
+//           }
+//         },
 
-        modal: {
-          ondismiss: () => setStatus("Mandate cancelled ❌"),
-        },
+//         modal: {
+//           ondismiss: () => setStatus("Mandate cancelled ❌"),
+//         },
 
-        theme: { color: "#0d6efd" },
-      };
+//         theme: { color: "#0d6efd" },
+//       };
 
-      new window.Razorpay(options).open();
-    } catch (err) {
-      console.error(err);
-      setStatus("Error occurred. Try again.");
+//       new window.Razorpay(options).open();
+//     } catch (err) {
+//       console.error(err);
+//       setStatus("Error occurred. Try again.");
+//     }
+//   };
+    const startSubscription = async () => {
+  if (expired) return;
+
+  try {
+    setStatus("Creating donor...");
+    const donor = await createDonor();
+    console.log("✅ Donor created:", donor);
+
+    setStatus("Creating subscription...");
+    const subRes = await createSubscription(donor.donorId);
+    console.log("✅ Subscription created:", subRes);
+
+    if (!subRes.success) {
+      setStatus("Subscription creation failed");
+      return;
     }
-  };
+
+    const options = {
+      key: subRes.keyId,
+      subscription_id: subRes.subscription_id,
+
+      name: "Feed The Hunger Seva Sangha Foundation",
+      description: "Monthly Donation (e-Mandate)",
+
+      prefill: {
+        name: `${donationData.firstName} ${donationData.lastName}`,
+        email: donationData.email,
+        contact: donationData.mobile,
+      },
+
+      handler: (response) => {
+        console.log("✅ Razorpay mandate initiated:", response);
+
+        // ✅ DO NOT VERIFY HERE
+        // ✅ Webhook will update mandate status
+
+        sessionStorage.removeItem("paymentStarted");
+
+        navigate(`/thankyou/${donor.donorId}`, {
+          state: {
+            frequency: "monthly",
+            subscriptionId: response.razorpay_subscription_id,
+            message:
+              "Your mandate request has been sent to your bank. You will receive confirmation shortly.",
+          },
+        });
+      },
+
+      modal: {
+        ondismiss: () => setStatus("Mandate setup cancelled ❌"),
+      },
+
+      theme: { color: "#0d6efd" },
+    };
+
+    new window.Razorpay(options).open();
+  } catch (err) {
+    console.error(err);
+    setStatus("Error occurred. Try again.");
+  }
+};
+
 
   // --------------------------------------------------
   // UI
@@ -1593,6 +1655,7 @@ console.log("📤 Mandate verify payload:", payload);
 }
 
 export default PaymentPage;
+
 
 
 
