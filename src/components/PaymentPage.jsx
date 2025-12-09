@@ -1578,14 +1578,16 @@ function PaymentPage() {
 
         sessionStorage.removeItem("paymentStarted");
 
-        navigate(`/thankyou/${donor.donorId}`, {
-          state: {
-            frequency: "monthly",
-            subscriptionId: response.razorpay_subscription_id,
-            message:
-              "Your mandate request has been sent to your bank. You will receive confirmation shortly.",
-          },
-        });
+    navigate(`/thankyou/${donor.donorId}`, {
+  state: {
+    donorId: donor.donorId,
+    amount: donationData.amount,
+    frequency: "monthly",
+    subscriptionId: response.razorpay_subscription_id,
+    info:
+      "Your mandate request has been submitted. Receipt will be available after confirmation.",
+  },
+});
       },
 
       modal: {
@@ -1655,6 +1657,7 @@ function PaymentPage() {
 }
 
 export default PaymentPage;
+
 
 
 
