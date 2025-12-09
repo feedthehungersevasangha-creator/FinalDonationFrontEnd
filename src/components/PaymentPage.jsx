@@ -1622,6 +1622,63 @@ function PaymentPage() {
 //   }
 // };
 
+// const startSubscription = async () => {
+//   if (expired) return;
+
+//   try {
+//     setStatus("Creating donor...");
+//     const donor = await createDonor();
+//     console.log("✅ Donor created:", donor);
+
+//     setStatus("Creating subscription...");
+//     const subRes = await createSubscription(donor.donorId);
+//     console.log("✅ Subscription created:", subRes);
+
+//     if (!subRes.success) {
+//       setStatus("Subscription creation failed");
+//       return;
+//     }
+
+//     const options = {
+//       key: subRes.keyId,
+//       subscription_id: subRes.subscription_id,
+
+//       name: "Feed The Hunger Seva Sangha Foundation",
+//       description: "Monthly Donation (e-Mandate)",
+
+//       prefill: {
+//         name: `${donationData.firstName} ${donationData.lastName}`,
+//         email: donationData.email,
+//         contact: donationData.mobile,
+//       },
+
+//       modal: {
+//         ondismiss: () => {
+//           setStatus("Mandate setup cancelled ❌");
+//           sessionStorage.removeItem("paymentStarted");
+//         },
+//       },
+
+//       theme: { color: "#0d6efd" },
+//     };
+
+//     // ✅ OPEN RAZORPAY
+//     const rzp = new window.Razorpay(options);
+//     rzp.open();
+
+//     // ✅ FORCE FULL PAGE REDIRECT (CRITICAL FIX)
+//     setTimeout(() => {
+//       sessionStorage.removeItem("paymentStarted");
+
+//       window.location.href = `/thankyou/${donor.donorId}`;
+//     }, 500); // small delay ensures checkout opens first
+
+//   } catch (err) {
+//     console.error(err);
+//     setStatus("Error occurred. Try again.");
+//     sessionStorage.removeItem("paymentStarted");
+//   }
+// };
 const startSubscription = async () => {
   if (expired) return;
 
@@ -1652,6 +1709,16 @@ const startSubscription = async () => {
         contact: donationData.mobile,
       },
 
+      /** ✅ THIS IS THE ONLY PLACE YOU REDIRECT */
+      handler: function (response) {
+        console.log("✅ Mandate flow initiated:", response);
+
+        sessionStorage.removeItem("paymentStarted");
+
+        // ✅ FULL PAGE REDIRECT (SAFE)
+        window.location.href = `/thankyou/${donor.donorId}`;
+      },
+
       modal: {
         ondismiss: () => {
           setStatus("Mandate setup cancelled ❌");
@@ -1662,16 +1729,8 @@ const startSubscription = async () => {
       theme: { color: "#0d6efd" },
     };
 
-    // ✅ OPEN RAZORPAY
     const rzp = new window.Razorpay(options);
     rzp.open();
-
-    // ✅ FORCE FULL PAGE REDIRECT (CRITICAL FIX)
-    setTimeout(() => {
-      sessionStorage.removeItem("paymentStarted");
-
-      window.location.href = `/thankyou/${donor.donorId}`;
-    }, 500); // small delay ensures checkout opens first
 
   } catch (err) {
     console.error(err);
@@ -1679,6 +1738,7 @@ const startSubscription = async () => {
     sessionStorage.removeItem("paymentStarted");
   }
 };
+
 
   // --------------------------------------------------
   // UI
@@ -1732,6 +1792,7 @@ const startSubscription = async () => {
 }
 
 export default PaymentPage;
+
 
 
 
