@@ -1707,17 +1707,30 @@ const startSubscription = async () => {
         name: `${donationData.firstName} ${donationData.lastName}`,
         email: donationData.email,
         contact: donationData.mobile,
-      },
-
-      /** ✅ THIS IS THE ONLY PLACE YOU REDIRECT */
-      handler: function (response) {
-        console.log("✅ Mandate flow initiated:", response);
-
+       },
+ handler: () => {
+        // ✅ Razorpay mandate screen completed
         sessionStorage.removeItem("paymentStarted");
 
-        // ✅ FULL PAGE REDIRECT (SAFE)
-        window.location.href = `/thankyou/${donor.donorId}`;
+        navigate("/thankyou", {
+          replace: true,
+          state: {
+            frequency: "monthly",
+            amount: donationData.amount,
+            subscriptionId: subRes.subscription_id,
+            donorId: donorRes.donorId,
+          },
+        });
       },
+      // /** ✅ THIS IS THE ONLY PLACE YOU REDIRECT */
+      // handler: function (response) {
+      //   console.log("✅ Mandate flow initiated:", response);
+
+      //   sessionStorage.removeItem("paymentStarted");
+
+      //   // ✅ FULL PAGE REDIRECT (SAFE)
+      //   window.location.href = `/thankyou/${donor.donorId}`;
+      // },
 
       modal: {
         ondismiss: () => {
@@ -1792,6 +1805,7 @@ const startSubscription = async () => {
 }
 
 export default PaymentPage;
+
 
 
 
