@@ -302,28 +302,157 @@
 // export default ThankYouPage;
 
 
+// import React from "react";
+// import { useLocation, useNavigate, useParams } from "react-router-dom";
+// import config from "../config";
+
+// const API_BASE = `${config.API_URL}`;
+
+// function ThankYouPage() {
+//   const { state } = useLocation();
+//   const navigate = useNavigate();
+//   const { donorId } = useParams();
+
+//   // ✅ SAFE FALLBACKS (important after full reload)
+//   const frequency = state?.frequency || "monthly"; // default monthly
+//   const amount = state?.amount || "--";
+//   const subscriptionId = state?.subscriptionId || null;
+//   const paymentId = state?.paymentId || null;
+
+//   const isSubscription = frequency === "monthly";
+
+//   const downloadReceipt = () => {
+//     if (!donorId) {
+//       alert("Receipt not yet available");
+//       return;
+//     }
+
+//     window.open(
+//       `${API_BASE}/api/donors/download/${donorId}`,
+//       "_blank"
+//     );
+//   };
+
+//   return (
+//     <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
+//       <div className="bg-white p-8 rounded-xl shadow-md text-center max-w-md w-full">
+
+//         <h2 className="text-2xl font-bold mb-4 text-green-600">
+//           🙏 Thank You for Your Support!
+//         </h2>
+
+//         {/* ✅ SUBSCRIPTION MESSAGE */}
+//         {isSubscription ? (
+//           <>
+//             <p className="text-gray-800 mb-3 text-lg font-medium">
+//               Thank you for setting up a <b>Monthly e-Mandate</b>.
+//             </p>
+
+//             <p className="text-gray-700 mb-2">
+//               Monthly Amount: <b>₹{amount}</b>
+//             </p>
+
+//             {subscriptionId && (
+//               <p className="text-sm text-gray-500 mb-3">
+//                 Subscription ID:
+//                 <br />
+//                 <b className="break-all">{subscriptionId}</b>
+//               </p>
+//             )}
+
+//             <p className="text-sm text-orange-600 leading-relaxed mb-4">
+//               Your bank authorization is under process.
+//               <br />
+//               ✅ Once approved, donations will be debited monthly.
+//               <br />
+//               📧 Mandate confirmation & receipts will be sent to your email.
+//             </p>
+//           </>
+//         ) : (
+//           <>
+//             {/* ✅ ONE-TIME MESSAGE */}
+//             <p className="text-gray-700 mb-2 text-lg">
+//               One-time donation of{" "}
+//               <span className="font-bold">₹{amount}</span>
+//             </p>
+
+//             {paymentId && (
+//               <p className="text-sm text-gray-500 mb-3">
+//                 Payment ID: <b>{paymentId}</b>
+//               </p>
+//             )}
+
+//             <button
+//               onClick={downloadReceipt}
+//               className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 mb-4"
+//             >
+//               Download Receipt
+//             </button>
+//           </>
+//         )}
+
+//         <button
+//           onClick={() => navigate("/")}
+//           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+//         >
+//           Go Home
+//         </button>
+
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default ThankYouPage;
+// ---------------------------------------------------------------------------------------------------
 import React from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import config from "../config";
 
 const API_BASE = `${config.API_URL}`;
 
 function ThankYouPage() {
-  const { state } = useLocation();
   const navigate = useNavigate();
-  const { donorId } = useParams();
+  const { state } = useLocation();
 
-  // ✅ SAFE FALLBACKS (important after full reload)
-  const frequency = state?.frequency || "monthly"; // default monthly
-  const amount = state?.amount || "--";
-  const subscriptionId = state?.subscriptionId || null;
-  const paymentId = state?.paymentId || null;
+  // ✅ HARD SAFETY (prevents white page)
+  if (!state) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="bg-white p-6 rounded-xl shadow text-center">
+          <h2 className="text-xl font-semibold text-green-600">
+            🙏 Thank You!
+          </h2>
+          <p className="text-gray-600 mt-2">
+            Your donation is being processed.
+            <br />
+            Please check your email for confirmation.
+          </p>
+
+          <button
+            onClick={() => navigate("/")}
+            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            Go Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const {
+    frequency,
+    amount,
+    subscriptionId,
+    donorId,
+    paymentId,
+  } = state;
 
   const isSubscription = frequency === "monthly";
 
   const downloadReceipt = () => {
     if (!donorId) {
-      alert("Receipt not yet available");
+      alert("Receipt not available yet");
       return;
     }
 
@@ -336,16 +465,14 @@ function ThankYouPage() {
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
       <div className="bg-white p-8 rounded-xl shadow-md text-center max-w-md w-full">
-
         <h2 className="text-2xl font-bold mb-4 text-green-600">
           🙏 Thank You for Your Support!
         </h2>
 
-        {/* ✅ SUBSCRIPTION MESSAGE */}
         {isSubscription ? (
           <>
-            <p className="text-gray-800 mb-3 text-lg font-medium">
-              Thank you for setting up a <b>Monthly e-Mandate</b>.
+            <p className="text-lg text-gray-800 font-medium mb-2">
+              Monthly e-Mandate Setup Successful
             </p>
 
             <p className="text-gray-700 mb-2">
@@ -360,20 +487,17 @@ function ThankYouPage() {
               </p>
             )}
 
-            <p className="text-sm text-orange-600 leading-relaxed mb-4">
-              Your bank authorization is under process.
+            <p className="text-sm text-orange-600 leading-relaxed">
+              ✅ Your bank authorization is in progress.
               <br />
-              ✅ Once approved, donations will be debited monthly.
-              <br />
-              📧 Mandate confirmation & receipts will be sent to your email.
+              📧 Mandate confirmation & monthly receipts
+              will be sent by email after approval.
             </p>
           </>
         ) : (
           <>
-            {/* ✅ ONE-TIME MESSAGE */}
-            <p className="text-gray-700 mb-2 text-lg">
-              One-time donation of{" "}
-              <span className="font-bold">₹{amount}</span>
+            <p className="text-lg text-gray-800 mb-2">
+              One-time donation of <b>₹{amount}</b>
             </p>
 
             {paymentId && (
@@ -393,15 +517,15 @@ function ThankYouPage() {
 
         <button
           onClick={() => navigate("/")}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
           Go Home
         </button>
-
       </div>
     </div>
   );
 }
 
 export default ThankYouPage;
+
 
