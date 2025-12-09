@@ -218,6 +218,90 @@
 
 // export default ThankYouPage;
 
+// import React from "react";
+// import { useLocation, useNavigate, useParams } from "react-router-dom";
+// import config from "../config";
+
+// const API_BASE = `${config.API_URL}`;
+
+// function ThankYouPage() {
+//   const { state } = useLocation();
+//   const navigate = useNavigate();
+//   const { donorId } = useParams();
+
+//   const isSubscription = state?.frequency === "monthly";
+
+//   const downloadReceipt = () => {
+//     if (!donorId) {
+//       alert("Receipt not yet available");
+//       return;
+//     }
+
+//     window.open(
+//       `${API_BASE}/api/donors/download/${donorId}`,
+//       "_blank"
+//     );
+//   };
+
+//   return (
+//     <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
+//       <div className="bg-white p-8 rounded-xl shadow-md text-center max-w-md w-full">
+
+//         <h2 className="text-2xl font-bold mb-4 text-green-600">
+//           🎉 Thank You for Your Support!
+//         </h2>
+
+//         <p className="text-gray-700 mb-2 text-lg">
+//           {isSubscription ? "Monthly donation" : "One-time donation"} of
+//           <span className="font-bold"> ₹{state?.amount}</span>
+//         </p>
+
+//         {isSubscription ? (
+//           <>
+//             <p className="text-sm text-gray-500 mb-2">
+//               Subscription ID:
+//               <br />
+//               <b>{state?.subscriptionId}</b>
+//             </p>
+
+//             <p className="text-sm text-orange-600 mb-4">
+//               Mandate confirmation & receipts will be sent by email
+//               once approved by your bank.
+//             </p>
+//           </>
+//         ) : (
+//           <p className="text-sm text-gray-500 mb-2">
+//             Payment ID: <b>{state?.paymentId}</b>
+//           </p>
+//         )}
+
+//         {/* ✅ ONLY SHOW DOWNLOAD FOR ONE-TIME */}
+//         {!isSubscription && (
+//           <button
+//             onClick={downloadReceipt}
+//             className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 mb-4"
+//           >
+//             Download Receipt
+//           </button>
+//         )}
+
+//         <br />
+
+//         <button
+//           onClick={() => navigate("/")}
+//           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+//         >
+//           Go Home
+//         </button>
+
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default ThankYouPage;
+
+
 import React from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import config from "../config";
@@ -229,7 +313,13 @@ function ThankYouPage() {
   const navigate = useNavigate();
   const { donorId } = useParams();
 
-  const isSubscription = state?.frequency === "monthly";
+  // ✅ SAFE FALLBACKS (important after full reload)
+  const frequency = state?.frequency || "monthly"; // default monthly
+  const amount = state?.amount || "--";
+  const subscriptionId = state?.subscriptionId || null;
+  const paymentId = state?.paymentId || null;
+
+  const isSubscription = frequency === "monthly";
 
   const downloadReceipt = () => {
     if (!donorId) {
@@ -248,44 +338,58 @@ function ThankYouPage() {
       <div className="bg-white p-8 rounded-xl shadow-md text-center max-w-md w-full">
 
         <h2 className="text-2xl font-bold mb-4 text-green-600">
-          🎉 Thank You for Your Support!
+          🙏 Thank You for Your Support!
         </h2>
 
-        <p className="text-gray-700 mb-2 text-lg">
-          {isSubscription ? "Monthly donation" : "One-time donation"} of
-          <span className="font-bold"> ₹{state?.amount}</span>
-        </p>
-
+        {/* ✅ SUBSCRIPTION MESSAGE */}
         {isSubscription ? (
           <>
-            <p className="text-sm text-gray-500 mb-2">
-              Subscription ID:
-              <br />
-              <b>{state?.subscriptionId}</b>
+            <p className="text-gray-800 mb-3 text-lg font-medium">
+              Thank you for setting up a <b>Monthly e-Mandate</b>.
             </p>
 
-            <p className="text-sm text-orange-600 mb-4">
-              Mandate confirmation & receipts will be sent by email
-              once approved by your bank.
+            <p className="text-gray-700 mb-2">
+              Monthly Amount: <b>₹{amount}</b>
+            </p>
+
+            {subscriptionId && (
+              <p className="text-sm text-gray-500 mb-3">
+                Subscription ID:
+                <br />
+                <b className="break-all">{subscriptionId}</b>
+              </p>
+            )}
+
+            <p className="text-sm text-orange-600 leading-relaxed mb-4">
+              Your bank authorization is under process.
+              <br />
+              ✅ Once approved, donations will be debited monthly.
+              <br />
+              📧 Mandate confirmation & receipts will be sent to your email.
             </p>
           </>
         ) : (
-          <p className="text-sm text-gray-500 mb-2">
-            Payment ID: <b>{state?.paymentId}</b>
-          </p>
-        )}
+          <>
+            {/* ✅ ONE-TIME MESSAGE */}
+            <p className="text-gray-700 mb-2 text-lg">
+              One-time donation of{" "}
+              <span className="font-bold">₹{amount}</span>
+            </p>
 
-        {/* ✅ ONLY SHOW DOWNLOAD FOR ONE-TIME */}
-        {!isSubscription && (
-          <button
-            onClick={downloadReceipt}
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 mb-4"
-          >
-            Download Receipt
-          </button>
-        )}
+            {paymentId && (
+              <p className="text-sm text-gray-500 mb-3">
+                Payment ID: <b>{paymentId}</b>
+              </p>
+            )}
 
-        <br />
+            <button
+              onClick={downloadReceipt}
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 mb-4"
+            >
+              Download Receipt
+            </button>
+          </>
+        )}
 
         <button
           onClick={() => navigate("/")}
@@ -300,5 +404,4 @@ function ThankYouPage() {
 }
 
 export default ThankYouPage;
-
 
