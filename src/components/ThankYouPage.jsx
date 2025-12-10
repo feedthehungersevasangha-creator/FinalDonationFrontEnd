@@ -416,29 +416,43 @@ function ThankYouPage() {
   const { state } = useLocation();
 
   // ✅ HARD SAFETY (prevents white page)
-  if (!state) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="bg-white p-6 rounded-xl shadow text-center">
-          <h2 className="text-xl font-semibold text-green-600">
-            🙏 Thank You!
-          </h2>
-          <p className="text-gray-600 mt-2">
-            Your donation is being processed.
-            <br />
-            Please check your email for confirmation.
-          </p>
+  // if (!state) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-gray-100">
+  //       <div className="bg-white p-6 rounded-xl shadow text-center">
+  //         <h2 className="text-xl font-semibold text-green-600">
+  //           🙏 Thank You!
+  //         </h2>
+  //         <p className="text-gray-600 mt-2">
+  //           Your donation is being processed.
+  //           <br />
+  //           Please check your email for confirmation.
+  //         </p>
 
-          <button
-            onClick={() => navigate("/")}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
-          >
-            Go Home
-          </button>
-        </div>
+  //         <button
+  //           onClick={() => navigate("/")}
+  //           className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+  //         >
+  //           Go Home
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+  const { state } = useLocation();
+
+if (!state) {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="bg-white p-6 rounded shadow text-center">
+        <h2>🙏 Thank You</h2>
+        <p>Your mandate is being processed.</p>
+        <button onClick={() => navigate("/")}>Go Home</button>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
 
   const {
     frequency,
@@ -527,5 +541,6 @@ function ThankYouPage() {
 }
 
 export default ThankYouPage;
+
 
 
