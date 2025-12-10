@@ -439,7 +439,6 @@ function ThankYouPage() {
   //     </div>
   //   );
   // }
-  const { state } = useLocation();
 
 if (!state) {
   return (
@@ -541,6 +540,7 @@ if (!state) {
 }
 
 export default ThankYouPage;
+
 
 
 
