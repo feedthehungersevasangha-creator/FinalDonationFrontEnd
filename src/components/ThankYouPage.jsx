@@ -470,7 +470,7 @@ if (!state) {
     }
 
     window.open(
-      `${API_BASE}/api/donors/download/${donorId}`,
+      `${API_BASE}/donors/download/${donorId}`,
       "_blank"
     );
   };
@@ -540,6 +540,7 @@ if (!state) {
 }
 
 export default ThankYouPage;
+
 
 
 
