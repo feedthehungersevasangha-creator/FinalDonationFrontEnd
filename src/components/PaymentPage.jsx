@@ -1439,13 +1439,15 @@ function PaymentPage() {
           if (verifyRes.success) {
             console.log("✅ Navigating to ThankYou with donorId:", verifyRes.donorId);
             sessionStorage.removeItem("paymentStarted");
-            navigate(`/thankyou/${verifyRes.donorId}`, {
-              state: {
-                ...donationData,
-                status: "success",
-                paymentId: response.razorpay_payment_id,
-              },
-            });
+               navigate("/thankyou", {
+      replace: true,
+      state: {
+        frequency: "onetime",
+        amount: donationData.amount,
+        paymentId: response.razorpay_payment_id,
+        donorId: verifyRes.donorId,
+      },
+    });
           } else {
             setStatus("Payment verification failed.");
           }
@@ -1679,21 +1681,94 @@ function PaymentPage() {
 //     sessionStorage.removeItem("paymentStarted");
 //   }
 // };
+// const startSubscription = async () => {
+//   if (expired) return;
+
+//   try {
+//     setStatus("Creating donor...");
+//     const donor = await createDonor();
+//     console.log("✅ Donor created:", donor);
+
+//     setStatus("Creating subscription...");
+//     const subRes = await createSubscription(donor.donorId);
+//     console.log("✅ Subscription created:", subRes);
+
+//     if (!subRes.success) {
+//       setStatus("Subscription creation failed");
+//       return;
+//     }
+
+//     const options = {
+//       key: subRes.keyId,
+//       subscription_id: subRes.subscription_id,
+
+//       name: "Feed The Hunger Seva Sangha Foundation",
+//       description: "Monthly Donation (e-Mandate)",
+
+//       prefill: {
+//         name: `${donationData.firstName} ${donationData.lastName}`,
+//         email: donationData.email,
+//         contact: donationData.mobile,
+//        },
+//  handler: () => {
+//         // ✅ Razorpay mandate screen completed
+//         sessionStorage.removeItem("paymentStarted");
+
+//         navigate("/thankyou", {
+//           replace: true,
+//           state: {
+//             frequency: "monthly",
+//             amount: donationData.amount,
+//             subscriptionId: subRes.subscription_id,
+//             donorId: donorRes.donorId,
+//           },
+//         });
+//       },
+//       // /** ✅ THIS IS THE ONLY PLACE YOU REDIRECT */
+//       // handler: function (response) {
+//       //   console.log("✅ Mandate flow initiated:", response);
+
+//       //   sessionStorage.removeItem("paymentStarted");
+
+//       //   // ✅ FULL PAGE REDIRECT (SAFE)
+//       //   window.location.href = `/thankyou/${donor.donorId}`;
+//       // },
+
+//       modal: {
+//         ondismiss: () => {
+//           setStatus("Mandate setup cancelled ❌");
+//           sessionStorage.removeItem("paymentStarted");
+//         },
+//       },
+
+//       theme: { color: "#0d6efd" },
+//     };
+
+//     const rzp = new window.Razorpay(options);
+//     rzp.open();
+
+//   } catch (err) {
+//     console.error(err);
+//     setStatus("Error occurred. Try again.");
+//     sessionStorage.removeItem("paymentStarted");
+//   }
+// };
 const startSubscription = async () => {
   if (expired) return;
 
   try {
     setStatus("Creating donor...");
-    const donor = await createDonor();
-    console.log("✅ Donor created:", donor);
+    const donor = await createDonor(); // ✅ donor exists
+
+    if (!donor || !donor.donorId) {
+      throw new Error("Donor ID missing");
+    }
 
     setStatus("Creating subscription...");
     const subRes = await createSubscription(donor.donorId);
-    console.log("✅ Subscription created:", subRes);
 
-    if (!subRes.success) {
-      setStatus("Subscription creation failed");
-      return;
+    if (!subRes || !subRes.subscription_id) {
+      throw new Error("Subscription creation failed");
     }
 
     const options = {
@@ -1707,9 +1782,11 @@ const startSubscription = async () => {
         name: `${donationData.firstName} ${donationData.lastName}`,
         email: donationData.email,
         contact: donationData.mobile,
-       },
- handler: () => {
-        // ✅ Razorpay mandate screen completed
+      },
+
+      handler: () => {
+        console.log("✅ Mandate flow completed");
+
         sessionStorage.removeItem("paymentStarted");
 
         navigate("/thankyou", {
@@ -1718,23 +1795,14 @@ const startSubscription = async () => {
             frequency: "monthly",
             amount: donationData.amount,
             subscriptionId: subRes.subscription_id,
-            donorId: donorRes.donorId,
+            donorId: donor.donorId, // ✅ CORRECT
           },
         });
       },
-      // /** ✅ THIS IS THE ONLY PLACE YOU REDIRECT */
-      // handler: function (response) {
-      //   console.log("✅ Mandate flow initiated:", response);
-
-      //   sessionStorage.removeItem("paymentStarted");
-
-      //   // ✅ FULL PAGE REDIRECT (SAFE)
-      //   window.location.href = `/thankyou/${donor.donorId}`;
-      // },
 
       modal: {
         ondismiss: () => {
-          setStatus("Mandate setup cancelled ❌");
+          setStatus("Mandate cancelled ❌");
           sessionStorage.removeItem("paymentStarted");
         },
       },
@@ -1742,12 +1810,10 @@ const startSubscription = async () => {
       theme: { color: "#0d6efd" },
     };
 
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-
+    new window.Razorpay(options).open();
   } catch (err) {
-    console.error(err);
-    setStatus("Error occurred. Try again.");
+    console.error("❌ Subscription error:", err);
+    setStatus("Something went wrong. Please try again.");
     sessionStorage.removeItem("paymentStarted");
   }
 };
@@ -1805,6 +1871,7 @@ const startSubscription = async () => {
 }
 
 export default PaymentPage;
+
 
 
 
