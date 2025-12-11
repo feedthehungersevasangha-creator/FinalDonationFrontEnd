@@ -1899,25 +1899,20 @@ function PaymentPage() {
 //   }
 // };
 // ---------------------------------------------------------------
-    const startSubscription = async () => {
+ 
+const startSubscription = async () => {
   if (expired) return;
 
   try {
     setStatus("Creating donor...");
     const donorRes = await createDonor();
-
-    if (!donorRes?.donorId) {
-      throw new Error("Donor ID missing");
-    }
+    if (!donorRes?.donorId) throw new Error("Donor creation failed");
 
     const donorId = donorRes.donorId;
 
     setStatus("Creating subscription...");
     const subRes = await createSubscription(donorId);
-
-    if (!subRes?.subscription_id) {
-      throw new Error("Subscription not created");
-    }
+    if (!subRes?.subscription_id) throw new Error("Subscription failed");
 
     const options = {
       key: subRes.keyId,
@@ -1932,7 +1927,20 @@ function PaymentPage() {
         contact: donationData.mobile,
       },
 
-      // 👉 THIS IS CALLED WHEN USER CLOSES Razorpay (success or cancel)
+      handler: () => {
+        sessionStorage.removeItem("paymentStarted");
+
+        navigate("/thankyou", {
+          replace: true,
+          state: {
+            frequency: "monthly",
+            donorId,
+            amount: donationData.amount,
+            subscriptionId: subRes.subscription_id,
+          },
+        });
+      },
+
       modal: {
         ondismiss: () => {
           sessionStorage.removeItem("paymentStarted");
@@ -1940,42 +1948,25 @@ function PaymentPage() {
           navigate("/thankyou", {
             replace: true,
             state: {
+              frequency: "monthly",
               donorId,
               amount: donationData.amount,
-              frequency: "monthly",
               subscriptionId: subRes.subscription_id,
-              status: "PENDING",   // Bank will approve later
-            }
+            },
           });
         },
       },
 
-      // 👉 handler is NOT used for e-mandate (bank confirms later)
-      handler: () => {
-        sessionStorage.removeItem("paymentStarted");
-
-        navigate("/thankyou", {
-          replace: true,
-          state: {
-            donorId,
-            amount: donationData.amount,
-            frequency: "monthly",
-            subscriptionId: subRes.subscription_id,
-            status: "PENDING",
-          }
-        });
-      },
-
-      theme: { color: "#0d6efd" }
+      theme: { color: "#0d6efd" },
     };
 
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-
+    new window.Razorpay(options).open();
   } catch (err) {
     console.error("Subscription Error:", err);
     setStatus("Something went wrong");
     sessionStorage.removeItem("paymentStarted");
+  }
+};
 
 
   // --------------------------------------------------
@@ -2030,6 +2021,7 @@ function PaymentPage() {
 }
 
 export default PaymentPage;
+
 
 
 
