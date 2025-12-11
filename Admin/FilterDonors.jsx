@@ -369,29 +369,34 @@ const [editData, setEditData] = useState(null);
 //     alert("Failed to load donation counts");
 //   }
 // };
-// const fetchCounts = async () => {
-//   const values = getValues();
+const fetchCounts = async () => {
+  const values = getValues();
 
-//   const from = values.startDate || "";
-//   const to = values.endDate || "";
+  const from = values.startDate;
+  const to = values.endDate;
 
-//   try {
-//     const response = await axios.get(
-//       `${config.API_URL}/donors/donation-counts`,
-//       {
-//         params: { from, to },
-//       }
-//     );
+  console.log("👉 Sending request:", { from, to });
 
-//     if (response.data.success) {
-//       setCounts(response.data.counts);
-//       setCountsOpen(true);
-//     }
-//   } catch (err) {
-//     console.error(err);
-//     alert("Failed to load donation counts");
-//   }
-// };
+  try {
+    const res = await axios.get(`${config.API_URL}/donors/donation-counts`, {
+      params: { from, to },
+    });
+
+    console.log("👉 Response:", res.data);
+
+    if (res.data.success) {
+      setCounts(res.data.counts);
+      setCountsOpen(true);
+    } else {
+      alert("Error loading counts");
+    }
+
+  } catch (e) {
+    console.error("❌ Error fetching counts", e);
+    alert("Failed to fetch donation counts");
+  }
+};
+
 
 const fetchCounts = async () => {
   const values = getValues();
