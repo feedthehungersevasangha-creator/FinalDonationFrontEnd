@@ -841,9 +841,9 @@ if (values.razorpayCustomerId) payload.razorpayCustomerId = values.razorpayCusto
       {counts ? (
         <div className="space-y-2">
           <p><strong>Total Donations:</strong> {counts.total || 0}</p>
-          <p><strong>One-Time Donations:</strong> {counts.oneTime || 0}</p>
-          <p><strong>Subscription Donations:</strong> {counts.subscription || 0}</p>
-          <p><strong>Failed Payments:</strong> {counts.failed || 0}</p>
+    <p><strong>One-Time Donations:</strong> {counts.onetime || 0}</p>
+    <p><strong>Subscription Donations:</strong> {counts.subscription || 0}</p>
+    <p><strong>Failed Payments:</strong> {counts.failed || 0}</p>
         </div>
       ) : (
         <p className="text-center">Loading...</p>
