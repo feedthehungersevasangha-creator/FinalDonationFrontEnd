@@ -398,28 +398,28 @@ const fetchCounts = async () => {
 };
 
 
-const fetchCounts = async () => {
-  const values = getValues();
-  const from = values.startDate || "";
-  const to = values.endDate || "";
+// const fetchCounts = async () => {
+//   const values = getValues();
+//   const from = values.startDate || "";
+//   const to = values.endDate || "";
 
-  try {
-    const response = await axios.get(
-      `${config.API_URL}/donors/donation-counts`,
-      { params: { from, to } }
-    );
+//   try {
+//     const response = await axios.get(
+//       `${config.API_URL}/donors/donation-counts`,
+//       { params: { from, to } }
+//     );
 
-    if (response.data.success) {
-      setCounts(response.data.counts);
-      setCountsOpen(true);
-    } else {
-      alert("Error loading counts");
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Failed to load donation counts");
-  }
-};
+//     if (response.data.success) {
+//       setCounts(response.data.counts);
+//       setCountsOpen(true);
+//     } else {
+//       alert("Error loading counts");
+//     }
+//   } catch (err) {
+//     console.error(err);
+//     alert("Failed to load donation counts");
+//   }
+// };
 
       // const { register, getValues, reset } = useForm();
       const { register, getValues, reset } = useForm({
