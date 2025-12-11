@@ -1975,7 +1975,7 @@ function PaymentPage() {
   } catch (err) {
     console.error("Subscription Error:", err);
     setStatus("Something went wrong");
-    sessionStorage.removeItem("paym
+    sessionStorage.removeItem("paymentStarted");
 
 
   // --------------------------------------------------
@@ -2030,6 +2030,7 @@ function PaymentPage() {
 }
 
 export default PaymentPage;
+
 
 
 
