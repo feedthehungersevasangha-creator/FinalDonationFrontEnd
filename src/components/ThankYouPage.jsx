@@ -540,7 +540,145 @@
 // }
 
 // export default ThankYouPage;
-// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------latest
+// import React from "react";
+// import { useLocation, useNavigate } from "react-router-dom";
+// import config from "../config";
+
+// const API_BASE = `${config.API_URL}`;
+
+// function ThankYouPage() {
+//   const navigate = useNavigate();
+//   const { state } = useLocation();
+
+//   // -------------------------------------------------------
+//   // 🛑 SAFETY: If no state → show general Thank You message
+//   // -------------------------------------------------------
+//   if (!state) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center bg-gray-100">
+//         <div className="bg-white p-6 rounded-xl shadow text-center max-w-md">
+//           <h2 className="text-xl font-semibold text-green-600">🙏 Thank You!</h2>
+//           <p className="text-gray-700 mt-2">
+//             Your donation / mandate is being processed.
+//             <br />
+//             You will receive an email update shortly.
+//           </p>
+
+//           <button
+//             onClick={() => navigate("/")}
+//             className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg"
+//           >
+//             Go Home
+//           </button>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   // -----------------------------------------------
+//   // Extract values passed from PaymentPage
+//   // -----------------------------------------------
+//   const { frequency, amount, subscriptionId, donorId, paymentId } = state;
+
+//   const isSubscription = frequency === "monthly";
+
+//   // -----------------------------------------------
+//   // Download Receipt (One-time only)
+//   // -----------------------------------------------
+//   const downloadReceipt = () => {
+//     if (!donorId) {
+//       alert("Receipt not available yet");
+//       return;
+//     }
+
+//     window.open(`${API_BASE}/donors/download/${donorId}`, "_blank");
+//   };
+
+//   // -----------------------------------------------
+//   // UI
+//   // -----------------------------------------------
+//   return (
+//     <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
+//       <div className="bg-white p-8 rounded-xl shadow-md text-center max-w-md w-full">
+//         <h2 className="text-2xl font-bold mb-4 text-green-600">
+//           🙏 Thank You for Your Support!
+//         </h2>
+
+//         {/* ─────────────────────────────────────────── */}
+//         {/* MONTHLY SUBSCRIPTION / E-MANDATE MESSAGE */}
+//         {/* ─────────────────────────────────────────── */}
+//         {isSubscription ? (
+//           <>
+//             <p className="text-lg text-gray-800 font-medium mb-2">
+//               Thanks for initiating your Monthly e-Mandate
+//             </p>
+
+//             <p className="text-gray-700 mb-2">
+//               Monthly Amount: <b>₹{amount}</b>
+//             </p>
+
+//             {subscriptionId && (
+//               <p className="text-sm text-gray-600 mb-3 break-words">
+//                 Subscription ID:
+//                 <br />
+//                 <b>{subscriptionId}</b>
+//               </p>
+//             )}
+
+//             <p className="text-sm text-orange-600 leading-relaxed mt-3">
+//               🔄 Your bank is processing your mandate request.
+//               <br />  
+//               Once approved, you will receive:
+//               <br />
+//               ✔ Mandate Confirmation Receipt  
+//               ✔ Monthly Debit Receipts (Every month)
+//             </p>
+
+//             <p className="text-sm text-gray-500 mt-3">
+//               If the mandate fails / rejected,  
+//               you will receive an SMS or Email notification.
+//             </p>
+//           </>
+//         ) : (
+//           <>
+//             {/* ─────────────────────────────────────────── */}
+//             {/* ONE-TIME PAYMENT MESSAGE */}
+//             {/* ─────────────────────────────────────────── */}
+//             <p className="text-lg text-gray-800 mb-2">
+//               One-time donation of <b>₹{amount}</b>
+//             </p>
+
+//             {paymentId && (
+//               <p className="text-sm text-gray-600 mb-3">
+//                 Payment ID: <b>{paymentId}</b>
+//               </p>
+//             )}
+
+//             <button
+//               onClick={downloadReceipt}
+//               className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 mb-4"
+//             >
+//               Download Receipt
+//             </button>
+//           </>
+//         )}
+
+//         <button
+//           onClick={() => navigate("/")}
+//           className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+//         >
+//           Go Home
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default ThankYouPage;
+// ------------------------------------------------------------------------------
+
+
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import config from "../config";
@@ -552,17 +690,101 @@ function ThankYouPage() {
   const { state } = useLocation();
 
   // -------------------------------------------------------
-  // 🛑 SAFETY: If no state → show general Thank You message
+  // 🛑 SAFETY: Direct access / page refresh
   // -------------------------------------------------------
   if (!state) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="bg-white p-6 rounded-xl shadow text-center max-w-md">
-          <h2 className="text-xl font-semibold text-green-600">🙏 Thank You!</h2>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+        <div className="bg-white p-6 rounded-xl shadow text-center max-w-md w-full">
+          <h2 className="text-xl font-semibold text-green-600">
+            🙏 Thank You
+          </h2>
           <p className="text-gray-700 mt-2">
-            Your donation / mandate is being processed.
+            Your request is being processed.
             <br />
-            You will receive an email update shortly.
+            You will receive an update via SMS or Email.
+          </p>
+          <button
+            onClick={() => navigate("/")}
+            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg"
+          >
+            Go Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------
+  // Extract navigation state
+  // -------------------------------------------------------
+  const {
+    uiStatus,
+    frequency,
+    amount,
+    subscriptionId,
+    donorId,
+    paymentId,
+  } = state;
+
+  // -------------------------------------------------------
+  // ❌ MONTHLY – USER ABANDONED MANDATE
+  // -------------------------------------------------------
+  if (uiStatus === "ABANDONED" && frequency === "monthly") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+        <div className="bg-white p-6 rounded-xl shadow text-center max-w-md w-full">
+          <h2 className="text-xl font-semibold text-red-600">
+            Mandate Not Completed
+          </h2>
+          <p className="text-gray-700 mt-2">
+            You closed the mandate setup before completing authorization.
+            <br />
+            No mandate has been registered with your bank.
+          </p>
+
+          <button
+            onClick={() => navigate("/donate")}
+            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------
+  // ⏳ MONTHLY – MANDATE INITIATED (BANK PROCESSING)
+  // -------------------------------------------------------
+  if (uiStatus === "INITIATED" && frequency === "monthly") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+        <div className="bg-white p-8 rounded-xl shadow-md text-center max-w-md w-full">
+          <h2 className="text-2xl font-bold mb-4 text-orange-600">
+            ⏳ Mandate Under Processing
+          </h2>
+
+          <p className="text-gray-700 mb-2">
+            Monthly Amount: <b>₹{amount}</b>
+          </p>
+
+          {subscriptionId && (
+            <p className="text-sm text-gray-600 mb-3 break-words">
+              Subscription ID:
+              <br />
+              <b>{subscriptionId}</b>
+            </p>
+          )}
+
+          <p className="text-sm text-gray-500 mt-3">
+            Your bank is reviewing your mandate request.
+            <br />
+            Approval may take a few minutes to 24 hours.
+          </p>
+
+          <p className="text-sm text-green-600 mt-2">
+            📩 You will receive SMS / Email once approved or rejected.
           </p>
 
           <button
@@ -576,97 +798,98 @@ function ThankYouPage() {
     );
   }
 
-  // -----------------------------------------------
-  // Extract values passed from PaymentPage
-  // -----------------------------------------------
-  const { frequency, amount, subscriptionId, donorId, paymentId } = state;
+  // -------------------------------------------------------
+  // ❌ ONE-TIME – PAYMENT CANCELLED
+  // -------------------------------------------------------
+  if (uiStatus === "CANCELLED" && frequency === "onetime") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+        <div className="bg-white p-6 rounded-xl shadow text-center max-w-md w-full">
+          <h2 className="text-xl font-semibold text-red-600">
+            ❌ Payment Cancelled
+          </h2>
+          <p className="text-gray-700 mt-2">
+            You cancelled the payment.
+            <br />
+            No amount was deducted.
+          </p>
 
-  const isSubscription = frequency === "monthly";
+          <button
+            onClick={() => navigate("/donate")}
+            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  // -----------------------------------------------
-  // Download Receipt (One-time only)
-  // -----------------------------------------------
+  // -------------------------------------------------------
+  // ❌ ONE-TIME – PAYMENT FAILED
+  // -------------------------------------------------------
+  if (uiStatus === "FAILED" && frequency === "onetime") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+        <div className="bg-white p-6 rounded-xl shadow text-center max-w-md w-full">
+          <h2 className="text-xl font-semibold text-red-600">
+            ❌ Payment Failed
+          </h2>
+          <p className="text-gray-700 mt-2">
+            The payment could not be completed.
+            <br />
+            If any amount was debited, it will be auto-refunded by your bank.
+          </p>
+
+          <button
+            onClick={() => navigate("/donate")}
+            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------
+  // ✅ ONE-TIME – PAYMENT SUCCESS
+  // -------------------------------------------------------
   const downloadReceipt = () => {
     if (!donorId) {
       alert("Receipt not available yet");
       return;
     }
-
     window.open(`${API_BASE}/donors/download/${donorId}`, "_blank");
   };
 
-  // -----------------------------------------------
-  // UI
-  // -----------------------------------------------
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="bg-white p-8 rounded-xl shadow-md text-center max-w-md w-full">
         <h2 className="text-2xl font-bold mb-4 text-green-600">
           🙏 Thank You for Your Support!
         </h2>
 
-        {/* ─────────────────────────────────────────── */}
-        {/* MONTHLY SUBSCRIPTION / E-MANDATE MESSAGE */}
-        {/* ─────────────────────────────────────────── */}
-        {isSubscription ? (
-          <>
-            <p className="text-lg text-gray-800 font-medium mb-2">
-              Thanks for initiating your Monthly e-Mandate
-            </p>
+        <p className="text-lg text-gray-800 mb-2">
+          One-time donation of <b>₹{amount}</b>
+        </p>
 
-            <p className="text-gray-700 mb-2">
-              Monthly Amount: <b>₹{amount}</b>
-            </p>
-
-            {subscriptionId && (
-              <p className="text-sm text-gray-600 mb-3 break-words">
-                Subscription ID:
-                <br />
-                <b>{subscriptionId}</b>
-              </p>
-            )}
-
-            <p className="text-sm text-orange-600 leading-relaxed mt-3">
-              🔄 Your bank is processing your mandate request.
-              <br />  
-              Once approved, you will receive:
-              <br />
-              ✔ Mandate Confirmation Receipt  
-              ✔ Monthly Debit Receipts (Every month)
-            </p>
-
-            <p className="text-sm text-gray-500 mt-3">
-              If the mandate fails / rejected,  
-              you will receive an SMS or Email notification.
-            </p>
-          </>
-        ) : (
-          <>
-            {/* ─────────────────────────────────────────── */}
-            {/* ONE-TIME PAYMENT MESSAGE */}
-            {/* ─────────────────────────────────────────── */}
-            <p className="text-lg text-gray-800 mb-2">
-              One-time donation of <b>₹{amount}</b>
-            </p>
-
-            {paymentId && (
-              <p className="text-sm text-gray-600 mb-3">
-                Payment ID: <b>{paymentId}</b>
-              </p>
-            )}
-
-            <button
-              onClick={downloadReceipt}
-              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 mb-4"
-            >
-              Download Receipt
-            </button>
-          </>
+        {paymentId && (
+          <p className="text-sm text-gray-600 mb-3">
+            Payment ID: <b>{paymentId}</b>
+          </p>
         )}
 
         <button
+          onClick={downloadReceipt}
+          className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 mb-4"
+        >
+          Download Receipt
+        </button>
+
+        <button
           onClick={() => navigate("/")}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg"
         >
           Go Home
         </button>
@@ -676,7 +899,6 @@ function ThankYouPage() {
 }
 
 export default ThankYouPage;
-
 
 
 
