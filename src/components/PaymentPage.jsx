@@ -1403,69 +1403,153 @@ function PaymentPage() {
     ).data;
 
   // --------------------------------------------------
-  // 🟡 ONE-TIME PAYMENT
+  // 🟡 ONE-TIME PAYMENT latest
   // --------------------------------------------------
-  const startPayment = async () => {
-    if (expired) return;
+  // const startPayment = async () => {
+  //   if (expired) return;
 
-    try {
-      setStatus("Creating order...");
-      const order = await createOrderOnBackend();
+  //   try {
+  //     setStatus("Creating order...");
+  //     const order = await createOrderOnBackend();
 
-      const options = {
-        key: order.keyId,
-        amount: order.amount,
-        currency: "INR",
-        order_id: order.id,
+  //     const options = {
+  //       key: order.keyId,
+  //       amount: order.amount,
+  //       currency: "INR",
+  //       order_id: order.id,
 
-        name: "Feed The Hunger Seva Sangha Foundation",
-        description: "Donation Payment",
+  //       name: "Feed The Hunger Seva Sangha Foundation",
+  //       description: "Donation Payment",
 
-        prefill: {
-          name: `${donationData.firstName} ${donationData.lastName}`,
-          email: donationData.email,
-          contact: donationData.mobile,
-        },
+  //       prefill: {
+  //         name: `${donationData.firstName} ${donationData.lastName}`,
+  //         email: donationData.email,
+  //         contact: donationData.mobile,
+  //       },
 
-        handler: async (response) => {
-          setStatus("Verifying payment...");
+  //       handler: async (response) => {
+  //         setStatus("Verifying payment...");
 
-          const verifyRes = await verifyOrderPayment({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-          });
+  //         const verifyRes = await verifyOrderPayment({
+  //           razorpay_order_id: response.razorpay_order_id,
+  //           razorpay_payment_id: response.razorpay_payment_id,
+  //           razorpay_signature: response.razorpay_signature,
+  //         });
 
-          if (verifyRes.success) {
-            console.log("✅ Navigating to ThankYou with donorId:", verifyRes.donorId);
-            sessionStorage.removeItem("paymentStarted");
-               navigate("/thankyou", {
-      replace: true,
-      state: {
-        frequency: "onetime",
-        amount: donationData.amount,
-        paymentId: response.razorpay_payment_id,
-        donorId: verifyRes.donorId,
+  //         if (verifyRes.success) {
+  //           console.log("✅ Navigating to ThankYou with donorId:", verifyRes.donorId);
+  //           sessionStorage.removeItem("paymentStarted");
+  //              navigate("/thankyou", {
+  //     replace: true,
+  //     state: {
+  //       frequency: "onetime",
+  //       amount: donationData.amount,
+  //       paymentId: response.razorpay_payment_id,
+  //       donorId: verifyRes.donorId,
+  //     },
+  //   });
+  //         } else {
+  //           setStatus("Payment verification failed.");
+  //         }
+  //       },
+
+  //       modal: {
+  //         ondismiss: () => setStatus("Payment cancelled ❌"),
+  //       },
+
+  //       theme: { color: "#0d6efd" },
+  //     };
+
+  //     new window.Razorpay(options).open();
+  //   } catch (err) {
+  //     console.error(err);
+  //     setStatus("Error occurred. Try again.");
+  //   }
+  // };
+// ------------------------------------------------------
+    const startPayment = async () => {
+  if (expired) return;
+
+  try {
+    setStatus("Creating order...");
+    const order = await createOrderOnBackend();
+
+    const options = {
+      key: order.keyId,
+      amount: order.amount,
+      currency: "INR",
+      order_id: order.id,
+
+      name: "Feed The Hunger Seva Sangha Foundation",
+      description: "Donation Payment",
+
+      prefill: {
+        name: `${donationData.firstName} ${donationData.lastName}`,
+        email: donationData.email,
+        contact: donationData.mobile,
       },
-    });
-          } else {
-            setStatus("Payment verification failed.");
-          }
+
+      // ✅ SUCCESS
+      handler: async (response) => {
+        setStatus("Verifying payment...");
+
+        const verifyRes = await verifyOrderPayment({
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+        });
+
+        sessionStorage.removeItem("paymentStarted");
+
+        if (verifyRes.success) {
+          navigate("/thankyou", {
+            replace: true,
+            state: {
+              uiStatus: "SUCCESS",
+              frequency: "onetime",
+              amount: donationData.amount,
+              donorId: verifyRes.donorId,
+              paymentId: response.razorpay_payment_id,
+            },
+          });
+        } else {
+          navigate("/thankyou", {
+            replace: true,
+            state: {
+              uiStatus: "FAILED",
+              frequency: "onetime",
+              amount: donationData.amount,
+            },
+          });
+        }
+      },
+
+      // ❌ USER CLOSED WINDOW
+      modal: {
+        ondismiss: () => {
+          sessionStorage.removeItem("paymentStarted");
+
+          navigate("/thankyou", {
+            replace: true,
+            state: {
+              uiStatus: "CANCELLED",
+              frequency: "onetime",
+              amount: donationData.amount,
+            },
+          });
         },
+      },
 
-        modal: {
-          ondismiss: () => setStatus("Payment cancelled ❌"),
-        },
+      theme: { color: "#0d6efd" },
+    };
 
-        theme: { color: "#0d6efd" },
-      };
-
-      new window.Razorpay(options).open();
-    } catch (err) {
-      console.error(err);
-      setStatus("Error occurred. Try again.");
-    }
-  };
+    new window.Razorpay(options).open();
+  } catch (err) {
+    console.error(err);
+    setStatus("Error occurred. Try again.");
+    sessionStorage.removeItem("paymentStarted");
+  }
+};
 
   // --------------------------------------------------
   // 🔵 SUBSCRIPTION / e-MANDATE
@@ -1899,8 +1983,77 @@ function PaymentPage() {
 //   }
 // };
 // ---------------------------------------------------------------
- 
-const startSubscription = async () => {
+ // latest
+// const startSubscription = async () => {
+//   if (expired) return;
+
+//   try {
+//     setStatus("Creating donor...");
+//     const donorRes = await createDonor();
+//     if (!donorRes?.donorId) throw new Error("Donor creation failed");
+
+//     const donorId = donorRes.donorId;
+
+//     setStatus("Creating subscription...");
+//     const subRes = await createSubscription(donorId);
+//     if (!subRes?.subscription_id) throw new Error("Subscription failed");
+
+//     const options = {
+//       key: subRes.keyId,
+//       subscription_id: subRes.subscription_id,
+
+//       name: "Feed The Hunger Seva Sangha Foundation",
+//       description: "Monthly Donation (e-Mandate)",
+
+//       prefill: {
+//         name: `${donationData.firstName} ${donationData.lastName}`,
+//         email: donationData.email,
+//         contact: donationData.mobile,
+//       },
+
+//       handler: () => {
+//         sessionStorage.removeItem("paymentStarted");
+
+//         navigate("/thankyou", {
+//           replace: true,
+//           state: {
+//             frequency: "monthly",
+//             donorId,
+//             amount: donationData.amount,
+//             subscriptionId: subRes.subscription_id,
+//           },
+//         });
+//       },
+
+//       modal: {
+//         ondismiss: () => {
+//           sessionStorage.removeItem("paymentStarted");
+
+//           navigate("/thankyou", {
+//             replace: true,
+//             state: {
+//               frequency: "monthly",
+//               donorId,
+//               amount: donationData.amount,
+//               subscriptionId: subRes.subscription_id,
+//             },
+//           });
+//         },
+//       },
+
+//       theme: { color: "#0d6efd" },
+//     };
+
+//     new window.Razorpay(options).open();
+//   } catch (err) {
+//     console.error("Subscription Error:", err);
+//     setStatus("Something went wrong");
+//     sessionStorage.removeItem("paymentStarted");
+//   }
+// };
+
+// -----------------------------------------------------
+    const startSubscription = async () => {
   if (expired) return;
 
   try {
@@ -1927,12 +2080,14 @@ const startSubscription = async () => {
         contact: donationData.mobile,
       },
 
+      // ✅ User reached bank authorization screen
       handler: () => {
         sessionStorage.removeItem("paymentStarted");
 
         navigate("/thankyou", {
           replace: true,
           state: {
+            uiStatus: "INITIATED",
             frequency: "monthly",
             donorId,
             amount: donationData.amount,
@@ -1941,6 +2096,7 @@ const startSubscription = async () => {
         });
       },
 
+      // ❌ User closed Razorpay before completing
       modal: {
         ondismiss: () => {
           sessionStorage.removeItem("paymentStarted");
@@ -1948,6 +2104,7 @@ const startSubscription = async () => {
           navigate("/thankyou", {
             replace: true,
             state: {
+              uiStatus: "ABANDONED",
               frequency: "monthly",
               donorId,
               amount: donationData.amount,
@@ -1967,7 +2124,6 @@ const startSubscription = async () => {
     sessionStorage.removeItem("paymentStarted");
   }
 };
-
 
   // --------------------------------------------------
   // UI
@@ -2021,6 +2177,7 @@ const startSubscription = async () => {
 }
 
 export default PaymentPage;
+
 
 
 
