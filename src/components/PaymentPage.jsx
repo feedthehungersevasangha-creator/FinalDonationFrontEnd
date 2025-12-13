@@ -1311,7 +1311,8 @@ const PAYMENT_TIMEOUT = 180; // 3 minutes (in seconds)
 function PaymentPage() {
   const { state: donationData } = useLocation();
   const navigate = useNavigate();
-
+const PAYMENT_TIMEOUT = 180; // seconds
+const EXPIRY_KEY = "paymentExpiryTime";
   const [status, setStatus] = useState("");
   const [timeLeft, setTimeLeft] = useState(PAYMENT_TIMEOUT);
   const [expired, setExpired] = useState(false);
@@ -1319,49 +1320,89 @@ function PaymentPage() {
   // --------------------------------------------------
   // 🛑 BLOCK INVALID ENTRY / DOUBLE PAYMENT
   // --------------------------------------------------
-  useEffect(() => {
-    if (!donationData) {
-      navigate("/");
-      return;
-    }
+  // useEffect(() => {
+  //   if (!donationData) {
+  //     navigate("/");
+  //     return;
+  //   }
 
-    if (sessionStorage.getItem("paymentStarted")) {
-      setExpired(true);
-      setStatus("Payment already attempted. Please refresh to retry.");
-      return;
-    }
+  //   if (sessionStorage.getItem("paymentStarted")) {
+  //     setExpired(true);
+  //     setStatus("Payment already attempted. Please refresh to retry.");
+  //     return;
+  //   }
 
-    sessionStorage.setItem("paymentStarted", "true");
+  //   sessionStorage.setItem("paymentStarted", "true");
 
-    return () => {
-      sessionStorage.removeItem("paymentStarted");
-    };
-  }, [donationData, navigate]);
+  //   return () => {
+  //     sessionStorage.removeItem("paymentStarted");
+  //   };
+  // }, [donationData, navigate]);
+// ----------------------------------------------------------------
+    useEffect(() => {
+  if (!donationData) {
+    navigate("/");
+    return;
+  }
+
+  // ✅ Set expiry time only once
+  if (!sessionStorage.getItem(EXPIRY_KEY)) {
+    const expiryTime = Date.now() + PAYMENT_TIMEOUT * 1000;
+    sessionStorage.setItem(EXPIRY_KEY, expiryTime.toString());
+  }
+}, [donationData, navigate]);
 
   // --------------------------------------------------
   // ⏱ 10-MINUTE PAYMENT TIMER
   // --------------------------------------------------
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          setExpired(true);
-          setStatus("Session expired. Please refresh the page.");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setTimeLeft((prev) => {
+  //       if (prev <= 1) {
+  //         clearInterval(interval);
+  //         setExpired(true);
+  //         setStatus("Session expired. Please refresh the page.");
+  //         return 0;
+  //       }
+  //       return prev - 1;
+  //     });
+  //   }, 1000);
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
 
-  const formatTime = (sec) => {
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${m}:${s.toString().padStart(2, "0")}`;
-  };
+  // const formatTime = (sec) => {
+  //   const m = Math.floor(sec / 60);
+  //   const s = sec % 60;
+  //   return `${m}:${s.toString().padStart(2, "0")}`;
+  // };
+    // ---------------------------------------------------------
+    useEffect(() => {
+  const interval = setInterval(() => {
+    const expiry = Number(sessionStorage.getItem(EXPIRY_KEY));
+    if (!expiry) return;
+
+    const remaining = Math.max(
+      Math.floor((expiry - Date.now()) / 1000),
+      0
+    );
+
+    setTimeLeft(remaining);
+
+    if (remaining === 0) {
+      setExpired(true);
+      setStatus("Session expired. Please try again.");
+
+      sessionStorage.removeItem("paymentStarted");
+      sessionStorage.removeItem(EXPIRY_KEY);
+
+      clearInterval(interval);
+    }
+  }, 1000);
+
+  return () => clearInterval(interval);
+}, []);
+
 
   // --------------------------------------------------
   // 🔧 Load Razorpay Script
@@ -1469,7 +1510,7 @@ function PaymentPage() {
 // ------------------------------------------------------
     const startPayment = async () => {
   if (expired) return;
-
+  sessionStorage.setItem("paymentStarted", "true");
   try {
     setStatus("Creating order...");
     const order = await createOrderOnBackend();
@@ -1500,6 +1541,7 @@ function PaymentPage() {
         });
 
         sessionStorage.removeItem("paymentStarted");
+            sessionStorage.removeItem(EXPIRY_KEY);
 
         if (verifyRes.success) {
           navigate("/thankyou", {
@@ -1528,7 +1570,7 @@ function PaymentPage() {
       modal: {
         ondismiss: () => {
           sessionStorage.removeItem("paymentStarted");
-
+  sessionStorage.removeItem(EXPIRY_KEY);
           navigate("/thankyou", {
             replace: true,
             state: {
@@ -1548,6 +1590,7 @@ function PaymentPage() {
     console.error(err);
     setStatus("Error occurred. Try again.");
     sessionStorage.removeItem("paymentStarted");
+    sessionStorage.removeItem(EXPIRY_KEY);
   }
 };
 
@@ -2055,7 +2098,7 @@ function PaymentPage() {
 // -----------------------------------------------------
     const startSubscription = async () => {
   if (expired) return;
-
+  sessionStorage.setItem("paymentStarted", "true");
   try {
     setStatus("Creating donor...");
     const donorRes = await createDonor();
@@ -2083,7 +2126,7 @@ function PaymentPage() {
       // ✅ User reached bank authorization screen
       handler: () => {
         sessionStorage.removeItem("paymentStarted");
-
+      sessionStorage.removeItem(EXPIRY_KEY);
         navigate("/thankyou", {
           replace: true,
           state: {
@@ -2100,7 +2143,7 @@ function PaymentPage() {
       modal: {
         ondismiss: () => {
           sessionStorage.removeItem("paymentStarted");
-
+  sessionStorage.removeItem(EXPIRY_KEY);
           navigate("/thankyou", {
             replace: true,
             state: {
@@ -2122,6 +2165,7 @@ function PaymentPage() {
     console.error("Subscription Error:", err);
     setStatus("Something went wrong");
     sessionStorage.removeItem("paymentStarted");
+    sessionStorage.removeItem(EXPIRY_KEY);
   }
 };
 
@@ -2177,6 +2221,7 @@ function PaymentPage() {
 }
 
 export default PaymentPage;
+
 
 
 
