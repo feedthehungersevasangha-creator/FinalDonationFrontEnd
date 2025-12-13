@@ -1415,7 +1415,11 @@ const EXPIRY_KEY = "paymentExpiryTime";
       document.body.appendChild(script);
     }
   }, []);
-
+  const formatTime = (sec) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
   // --------------------------------------------------
   // API CALLS
   // --------------------------------------------------
@@ -2221,6 +2225,7 @@ const EXPIRY_KEY = "paymentExpiryTime";
 }
 
 export default PaymentPage;
+
 
 
 
