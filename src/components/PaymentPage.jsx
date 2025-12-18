@@ -1320,25 +1320,7 @@ const EXPIRY_KEY = "paymentExpiryTime";
   // --------------------------------------------------
   // 🛑 BLOCK INVALID ENTRY / DOUBLE PAYMENT
   // --------------------------------------------------
-  // useEffect(() => {
-  //   if (!donationData) {
-  //     navigate("/");
-  //     return;
-  //   }
-
-  //   if (sessionStorage.getItem("paymentStarted")) {
-  //     setExpired(true);
-  //     setStatus("Payment already attempted. Please refresh to retry.");
-  //     return;
-  //   }
-
-  //   sessionStorage.setItem("paymentStarted", "true");
-
-  //   return () => {
-  //     sessionStorage.removeItem("paymentStarted");
-  //   };
-  // }, [donationData, navigate]);
-// ----------------------------------------------------------------
+  
     useEffect(() => {
   if (!donationData) {
     navigate("/");
@@ -1355,28 +1337,6 @@ const EXPIRY_KEY = "paymentExpiryTime";
   // --------------------------------------------------
   // ⏱ 10-MINUTE PAYMENT TIMER
   // --------------------------------------------------
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setTimeLeft((prev) => {
-  //       if (prev <= 1) {
-  //         clearInterval(interval);
-  //         setExpired(true);
-  //         setStatus("Session expired. Please refresh the page.");
-  //         return 0;
-  //       }
-  //       return prev - 1;
-  //     });
-  //   }, 1000);
-
-  //   return () => clearInterval(interval);
-  // }, []);
-
-  // const formatTime = (sec) => {
-  //   const m = Math.floor(sec / 60);
-  //   const s = sec % 60;
-  //   return `${m}:${s.toString().padStart(2, "0")}`;
-  // };
-    // ---------------------------------------------------------
     useEffect(() => {
   const interval = setInterval(() => {
     const expiry = Number(sessionStorage.getItem(EXPIRY_KEY));
@@ -1429,6 +1389,11 @@ const EXPIRY_KEY = "paymentExpiryTime";
   const createDonor = async () =>
     (await axios.post(`${API_BASE}/payment/create-donor-record`, donationData))
       .data;
+const createMandateOrder = async () =>
+  (await axios.post(`${API_BASE}/emandate/create-order`, donationData)).data;
+
+const verifyMandate = async (payload) =>
+  (await axios.post(`${API_BASE}/emandate/verify`, payload)).data;
 
   const createSubscription = async (donorId) =>
     (
@@ -2110,7 +2075,7 @@ const EXPIRY_KEY = "paymentExpiryTime";
 
     const donorId = donorRes.donorId;
 
-    setStatus("Creating subscription...");
+    setStatus("Starting process...");
     const subRes = await createSubscription(donorId);
     if (!subRes?.subscription_id) throw new Error("Subscription failed");
 
@@ -2172,6 +2137,135 @@ const EXPIRY_KEY = "paymentExpiryTime";
     sessionStorage.removeItem(EXPIRY_KEY);
   }
 };
+    const startMandate = async () => {
+  try {
+    const res = await axios.post(
+      `${API_BASE}/emandate/create-order`,
+      donationData
+    );
+
+    const options = {
+      key: res.data.keyId,
+      order_id: res.data.orderId,
+      amount: res.data.amount,
+      currency: "INR",
+
+      method: {
+        netbanking: true,
+        card: true,
+        upi: false,
+        wallet: false,
+      },
+
+      name: "Feed The Hunger Seva Sangha Foundation",
+      description: "Bank e-Mandate Authorization",
+
+      prefill: {
+        name: `${donationData.firstName} ${donationData.lastName}`,
+        email: donationData.email,
+        contact: donationData.mobile,
+      },
+
+      handler: async (response) => {
+        await axios.post(`${API_BASE}/emandate/verify`, response);
+
+        navigate("/thankyou", {
+          replace: true,
+          state: {
+            frequency: "monthly",
+            uiStatus: "MANDATE_CREATED",
+          },
+        });
+      },
+
+      modal: {
+        ondismiss: () => alert("Mandate cancelled"),
+      },
+    };
+
+    new window.Razorpay(options).open();
+  } catch (err) {
+    console.error(err);
+    alert("Mandate failed");
+  }
+};
+    const startPureMandate = async () => {
+  if (expired) return;
+
+  sessionStorage.setItem("paymentStarted", "true");
+
+  try {
+    setStatus("Starting bank mandate...");
+
+    const order = await createMandateOrder();
+
+    const options = {
+      key: order.keyId,
+      order_id: order.orderId,
+      amount: order.amount,
+      currency: "INR",
+
+      method: {
+        netbanking: true,
+        card: true,
+        upi: false,
+        wallet: false,
+      },
+
+      name: "Feed The Hunger Seva Sangha Foundation",
+      description: "Bank e-Mandate Authorization",
+
+      prefill: {
+        name: `${donationData.firstName} ${donationData.lastName}`,
+        email: donationData.email,
+        contact: donationData.mobile,
+      },
+
+      handler: async (res) => {
+        sessionStorage.removeItem("paymentStarted");
+        sessionStorage.removeItem(EXPIRY_KEY);
+
+        await verifyMandate(res);
+
+        navigate("/thankyou", {
+          replace: true,
+          state: {
+            uiStatus: "MANDATE_CREATED",
+            frequency: "monthly",
+            amount: donationData.amount,
+          },
+        });
+      },
+
+      modal: {
+        ondismiss: () => {
+          sessionStorage.removeItem("paymentStarted");
+          sessionStorage.removeItem(EXPIRY_KEY);
+
+          navigate("/thankyou", {
+            replace: true,
+            state: {
+              uiStatus: "ABANDONED",
+              frequency: "monthly",
+            },
+          });
+        },
+      },
+
+      theme: { color: "#16a34a" },
+    };
+
+    new window.Razorpay(options).open();
+
+  } catch (e) {
+    console.error(e);
+    setStatus("Mandate failed");
+    sessionStorage.removeItem("paymentStarted");
+    sessionStorage.removeItem(EXPIRY_KEY);
+  }
+};
+
+
 
   // --------------------------------------------------
   // UI
@@ -2203,20 +2297,27 @@ const EXPIRY_KEY = "paymentExpiryTime";
             Pay Once ₹{donationData.amount}
           </button>
         )}
+{donationData.frequency === "monthly" && (
+  <>
+    <button
+      onClick={startSubscription}
+      disabled={expired}
+      className="w-full py-3 rounded-lg bg-blue-600 text-white mb-3"
+    >
+      Setup Monthly e-Mandate (Subscription)
+    </button>
 
-        {donationData.frequency === "monthly" && (
-          <button
-            onClick={startSubscription}
-            disabled={expired}
-            className={`w-full py-3 rounded-lg ${
-              expired
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 text-white"
-            }`}
-          >
-            Setup Monthly e-Mandate ₹{donationData.amount}
-          </button>
-        )}
+    <button
+      onClick={startPureMandate}
+      disabled={expired}
+      className="w-full py-3 rounded-lg bg-green-600 text-white"
+    >
+      Setup Bank e-Mandate (Direct)
+    </button>
+  </>
+)}
+
+       
 
         <p className="mt-4 text-sm text-gray-700">{status}</p>
       </div>
@@ -2225,6 +2326,7 @@ const EXPIRY_KEY = "paymentExpiryTime";
 }
 
 export default PaymentPage;
+
 
 
 
