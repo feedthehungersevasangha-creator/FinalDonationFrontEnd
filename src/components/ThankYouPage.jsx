@@ -851,6 +851,39 @@ function ThankYouPage() {
       </div>
     );
   }
+// -------------------------------------------------------
+// ✅ PURE e-MANDATE – BANK APPROVED
+// -------------------------------------------------------
+if (uiStatus === "MANDATE_CREATED" && frequency === "monthly") {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="bg-white p-8 rounded-xl shadow-md text-center max-w-md w-full">
+        <h2 className="text-2xl font-bold mb-4 text-green-600">
+          ✅ Bank e-Mandate Created
+        </h2>
+
+        <p className="text-gray-700 mb-2">
+          Your bank has successfully approved the mandate.
+        </p>
+
+        <p className="text-sm text-gray-600">
+          Monthly Amount: <b>₹{amount}</b>
+        </p>
+
+        <p className="text-sm text-green-600 mt-3">
+          No further action is required from you.
+        </p>
+
+        <button
+          onClick={() => navigate("/")}
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg"
+        >
+          Go Home
+        </button>
+      </div>
+    </div>
+  );
+}
 
   // -------------------------------------------------------
   // ✅ ONE-TIME – PAYMENT SUCCESS
@@ -899,6 +932,7 @@ function ThankYouPage() {
 }
 
 export default ThankYouPage;
+
 
 
 
