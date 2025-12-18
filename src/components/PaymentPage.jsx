@@ -2189,6 +2189,81 @@ const verifyMandate = async (payload) =>
     alert("Mandate failed");
   }
 };
+//     const startPureMandate = async () => {
+//   if (expired) return;
+
+//   sessionStorage.setItem("paymentStarted", "true");
+
+//   try {
+//     setStatus("Starting bank mandate...");
+
+//     const order = await createMandateOrder();
+
+//     const options = {
+//       key: order.keyId,
+//       order_id: order.orderId,
+//       amount: order.amount,
+//       currency: "INR",
+
+//       method: {
+//         netbanking: true,
+//         card: true,
+//         upi: false,
+//         wallet: false,
+//       },
+
+//       name: "Feed The Hunger Seva Sangha Foundation",
+//       description: "Bank e-Mandate Authorization",
+
+//       prefill: {
+//         name: `${donationData.firstName} ${donationData.lastName}`,
+//         email: donationData.email,
+//         contact: donationData.mobile,
+//       },
+
+//       handler: async (res) => {
+//         sessionStorage.removeItem("paymentStarted");
+//         sessionStorage.removeItem(EXPIRY_KEY);
+
+//         await verifyMandate(res);
+
+//         navigate("/thankyou", {
+//           replace: true,
+//           state: {
+//             uiStatus: "MANDATE_CREATED",
+//             frequency: "monthly",
+//             amount: donationData.amount,
+//           },
+//         });
+//       },
+
+//       modal: {
+//         ondismiss: () => {
+//           sessionStorage.removeItem("paymentStarted");
+//           sessionStorage.removeItem(EXPIRY_KEY);
+
+//           navigate("/thankyou", {
+//             replace: true,
+//             state: {
+//               uiStatus: "ABANDONED",
+//               frequency: "monthly",
+//             },
+//           });
+//         },
+//       },
+
+//       theme: { color: "#16a34a" },
+//     };
+
+//     new window.Razorpay(options).open();
+
+//   } catch (e) {
+//     console.error(e);
+//     setStatus("Mandate failed");
+//     sessionStorage.removeItem("paymentStarted");
+//     sessionStorage.removeItem(EXPIRY_KEY);
+//   }
+// };
     const startPureMandate = async () => {
   if (expired) return;
 
@@ -2221,11 +2296,13 @@ const verifyMandate = async (payload) =>
         contact: donationData.mobile,
       },
 
-      handler: async (res) => {
+      handler: async (response) => {
         sessionStorage.removeItem("paymentStarted");
         sessionStorage.removeItem(EXPIRY_KEY);
 
-        await verifyMandate(res);
+        console.log("✅ Razorpay mandate response:", response);
+
+        await verifyMandate(response); // 🔥 MUST HAPPEN
 
         navigate("/thankyou", {
           replace: true,
@@ -2264,6 +2341,7 @@ const verifyMandate = async (payload) =>
     sessionStorage.removeItem(EXPIRY_KEY);
   }
 };
+
 
 
 
@@ -2326,6 +2404,7 @@ const verifyMandate = async (payload) =>
 }
 
 export default PaymentPage;
+
 
 
 
