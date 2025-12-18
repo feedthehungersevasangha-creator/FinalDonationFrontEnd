@@ -1390,10 +1390,10 @@ const EXPIRY_KEY = "paymentExpiryTime";
     (await axios.post(`${API_BASE}/payment/create-donor-record`, donationData))
       .data;
 const createMandateOrder = async () =>
-  (await axios.post(`${API_BASE}/emandate/create-order`, donationData)).data;
+  (await axios.post(`${API_BASE}/payment/emandate/create-order`, donationData)).data;
 
 const verifyMandate = async (payload) =>
-  (await axios.post(`${API_BASE}/emandate/verify`, payload)).data;
+  (await axios.post(`${API_BASE}/payment/emandate/verify`, payload)).data;
 
   const createSubscription = async (donorId) =>
     (
@@ -2326,6 +2326,7 @@ const verifyMandate = async (payload) =>
 }
 
 export default PaymentPage;
+
 
 
 
