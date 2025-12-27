@@ -2413,7 +2413,6 @@ import config from "../config";
 
 const API_BASE = `${config.API_URL}`;
 // const PAYMENT_TIMEOUT = 600; // 10 minutes (in seconds)
-const PAYMENT_TIMEOUT = 180; // 3 minutes (in seconds)
 
 function PaymentPage() {
   const { state: donationData } = useLocation();
@@ -2638,7 +2637,8 @@ const EXPIRY_KEY = "paymentExpiryTime";
   );
 }
 
-export default
+export default PaymentPage;
+
 
 
 
