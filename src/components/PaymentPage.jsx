@@ -2183,7 +2183,7 @@ const EXPIRY_KEY = "paymentExpiryTime";
 //   }
 // };
     // -----------------------------testing above logic was working fine
-    const startSubscription = async () => {
+  const startSubscription = async () => {
   if (expired) return;
 
   sessionStorage.setItem("paymentStarted", "true");
@@ -2191,26 +2191,20 @@ const EXPIRY_KEY = "paymentExpiryTime";
   try {
     setStatus("Creating donor...");
     const donorRes = await createDonor();
-
-    if (!donorRes?.donorId) {
-      throw new Error("Donor creation failed");
-    }
+    if (!donorRes?.donorId) throw new Error("Donor creation failed");
 
     const donorId = donorRes.donorId;
 
-    setStatus("Setting up mandate...");
+    setStatus("Authorizing mandate...");
     const subRes = await createSubscription(donorId);
-
-    if (!subRes?.subscription_id) {
-      throw new Error("Subscription creation failed");
-    }
+    if (!subRes?.subscription_id) throw new Error("Subscription failed");
 
     const options = {
       key: subRes.keyId,
       subscription_id: subRes.subscription_id,
 
       name: "Feed The Hunger Seva Sangha Foundation",
-      description: "Monthly Donation (e-Mandate / AutoPay)",
+      description: "Monthly Donation (e-Mandate)",
 
       prefill: {
         name: `${donationData.firstName} ${donationData.lastName}`,
@@ -2218,17 +2212,15 @@ const EXPIRY_KEY = "paymentExpiryTime";
         contact: donationData.mobile,
       },
 
-      // ✅ Mandate screen finished (BANK / UPI AUTH)
+      // ✅ User completed bank authentication
       handler: () => {
-        console.log("✅ Mandate initiated");
-
         sessionStorage.removeItem("paymentStarted");
         sessionStorage.removeItem(EXPIRY_KEY);
 
         navigate("/thankyou", {
           replace: true,
           state: {
-            uiStatus: "MANDATE_INITIATED",
+            uiStatus: "AUTHENTICATED",
             frequency: "monthly",
             donorId,
             subscriptionId: subRes.subscription_id,
@@ -2237,22 +2229,19 @@ const EXPIRY_KEY = "paymentExpiryTime";
         });
       },
 
-      // ❌ User closed without completing auth
+      // ❌ User abandoned
       modal: {
         ondismiss: () => {
-          console.warn("❌ Mandate abandoned");
-
           sessionStorage.removeItem("paymentStarted");
           sessionStorage.removeItem(EXPIRY_KEY);
 
           navigate("/thankyou", {
             replace: true,
             state: {
-              uiStatus: "MANDATE_ABANDONED",
+              uiStatus: "ABANDONED",
               frequency: "monthly",
               donorId,
               subscriptionId: subRes.subscription_id,
-              amount: donationData.amount,
             },
           });
         },
@@ -2262,16 +2251,13 @@ const EXPIRY_KEY = "paymentExpiryTime";
     };
 
     new window.Razorpay(options).open();
-
   } catch (err) {
-    console.error("❌ Subscription error:", err);
-    setStatus("Something went wrong. Please try again.");
-
+    console.error(err);
+    setStatus("Something went wrong");
     sessionStorage.removeItem("paymentStarted");
     sessionStorage.removeItem(EXPIRY_KEY);
   }
 };
-
 
 
   // --------------------------------------------------
@@ -2326,6 +2312,7 @@ const EXPIRY_KEY = "paymentExpiryTime";
 
 export default PaymentPage;
 // working good 
+
 
 
 
