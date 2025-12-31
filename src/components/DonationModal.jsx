@@ -266,7 +266,7 @@ function DonationModal() {
     >
       <option value="">Please Select E-Mandate  Date </option>
       <option value="2">2th of Next Month</option>
-      <option value="9">9th of Next Month</option>
+      <option value="5">5th of Next Month</option>
       <option value="15">15th of Next Month</option>
     </select>
     {errors.startDay && (
@@ -418,6 +418,7 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
 
 
