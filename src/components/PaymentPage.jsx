@@ -2058,136 +2058,9 @@ const EXPIRY_KEY = "paymentExpiryTime";
 // };
 
 // -----------------------------------------------------
-//     const startSubscription = async () => {
-//   if (expired) return;
-//   sessionStorage.setItem("paymentStarted", "true");
-//   try {
-//     setStatus("Creating donor...");
-//     const donorRes = await createDonor();
-//     if (!donorRes?.donorId) throw new Error("Donor creation failed");
-
-//     const donorId = donorRes.donorId;
-
-//     setStatus("Starting process...");
-//     const subRes = await createSubscription(donorId);
-//     if (!subRes?.subscription_id) throw new Error("Subscription failed");
-
-//     const options = {
-//       key: subRes.keyId,
-//       subscription_id: subRes.subscription_id,
-
-//       name: "Feed The Hunger Seva Sangha Foundation",
-//       description: "Monthly Donation (e-Mandate)",
-
-//       prefill: {
-//         name: `${donationData.firstName} ${donationData.lastName}`,
-//         email: donationData.email,
-//         contact: donationData.mobile,
-//       },
-
-//       // ✅ User reached bank authorization screen
-//       handler: () => {
-//         sessionStorage.removeItem("paymentStarted");
-//       sessionStorage.removeItem(EXPIRY_KEY);
-//         navigate("/thankyou", {
-//           replace: true,
-//           state: {
-//             uiStatus: "INITIATED",
-//             frequency: "monthly",
-//             donorId,
-//             amount: donationData.amount,
-//             subscriptionId: subRes.subscription_id,
-//           },
-//         });
-//       },
-
-//       // ❌ User closed Razorpay before completing
-//       modal: {
-//         ondismiss: () => {
-//           sessionStorage.removeItem("paymentStarted");
-//   sessionStorage.removeItem(EXPIRY_KEY);
-//           navigate("/thankyou", {
-//             replace: true,
-//             state: {
-//               uiStatus: "ABANDONED",
-//               frequency: "monthly",
-//               donorId,
-//               amount: donationData.amount,
-//               subscriptionId: subRes.subscription_id,
-//             },
-//           });
-//         },
-//       },
-
-//       theme: { color: "#0d6efd" },
-//     };
-
-//     new window.Razorpay(options).open();
-//   } catch (err) {
-//     console.error("Subscription Error:", err);
-//     setStatus("Something went wrong");
-//     sessionStorage.removeItem("paymentStarted");
-//     sessionStorage.removeItem(EXPIRY_KEY);
-//   }
-// };
-//     const startMandate = async () => {
-//   try {
-//     const res = await axios.post(
-//       `${API_BASE}/emandate/create-order`,
-//       donationData
-//     );
-
-//     const options = {
-//       key: res.data.keyId,
-//       order_id: res.data.orderId,
-//       amount: res.data.amount,
-//       currency: "INR",
-
-//       method: {
-//         netbanking: true,
-//         card: true,
-//         upi: false,
-//         wallet: false,
-//       },
-
-//       name: "Feed The Hunger Seva Sangha Foundation",
-//       description: "Bank e-Mandate Authorization",
-
-//       prefill: {
-//         name: `${donationData.firstName} ${donationData.lastName}`,
-//         email: donationData.email,
-//         contact: donationData.mobile,
-//       },
-
-//       handler: async (response) => {
-//         await axios.post(`${API_BASE}/emandate/verify`, response);
-
-//         navigate("/thankyou", {
-//           replace: true,
-//           state: {
-//             frequency: "monthly",
-//             uiStatus: "MANDATE_CREATED",
-//           },
-//         });
-//       },
-
-//       modal: {
-//         ondismiss: () => alert("Mandate cancelled"),
-//       },
-//     };
-
-//     new window.Razorpay(options).open();
-//   } catch (err) {
-//     console.error(err);
-//     alert("Mandate failed");
-//   }
-// };
-    // -----------------------------testing above logic was working fine
-  const startSubscription = async () => {
+    const startSubscription = async () => {
   if (expired) return;
-
   sessionStorage.setItem("paymentStarted", "true");
-
   try {
     setStatus("Creating donor...");
     const donorRes = await createDonor();
@@ -2195,7 +2068,7 @@ const EXPIRY_KEY = "paymentExpiryTime";
 
     const donorId = donorRes.donorId;
 
-    setStatus("Authorizing mandate...");
+    setStatus("Starting process...");
     const subRes = await createSubscription(donorId);
     if (!subRes?.subscription_id) throw new Error("Subscription failed");
 
@@ -2212,35 +2085,34 @@ const EXPIRY_KEY = "paymentExpiryTime";
         contact: donationData.mobile,
       },
 
-      // ✅ User completed bank authentication
+      // ✅ User reached bank authorization screen
       handler: () => {
         sessionStorage.removeItem("paymentStarted");
-        sessionStorage.removeItem(EXPIRY_KEY);
-
+      sessionStorage.removeItem(EXPIRY_KEY);
         navigate("/thankyou", {
           replace: true,
           state: {
-            uiStatus: "AUTHENTICATED",
+            uiStatus: "INITIATED",
             frequency: "monthly",
             donorId,
-            subscriptionId: subRes.subscription_id,
             amount: donationData.amount,
+            subscriptionId: subRes.subscription_id,
           },
         });
       },
 
-      // ❌ User abandoned
+      // ❌ User closed Razorpay before completing
       modal: {
         ondismiss: () => {
           sessionStorage.removeItem("paymentStarted");
-          sessionStorage.removeItem(EXPIRY_KEY);
-
+  sessionStorage.removeItem(EXPIRY_KEY);
           navigate("/thankyou", {
             replace: true,
             state: {
               uiStatus: "ABANDONED",
               frequency: "monthly",
               donorId,
+              amount: donationData.amount,
               subscriptionId: subRes.subscription_id,
             },
           });
@@ -2252,12 +2124,140 @@ const EXPIRY_KEY = "paymentExpiryTime";
 
     new window.Razorpay(options).open();
   } catch (err) {
-    console.error(err);
+    console.error("Subscription Error:", err);
     setStatus("Something went wrong");
     sessionStorage.removeItem("paymentStarted");
     sessionStorage.removeItem(EXPIRY_KEY);
   }
 };
+    const startMandate = async () => {
+  try {
+    const res = await axios.post(
+      `${API_BASE}/emandate/create-order`,
+      donationData
+    );
+
+    const options = {
+      key: res.data.keyId,
+      order_id: res.data.orderId,
+      amount: res.data.amount,
+      currency: "INR",
+
+      method: {
+        netbanking: true,
+        card: true,
+        upi: false,
+        wallet: false,
+      },
+
+      name: "Feed The Hunger Seva Sangha Foundation",
+      description: "Bank e-Mandate Authorization",
+
+      prefill: {
+        name: `${donationData.firstName} ${donationData.lastName}`,
+        email: donationData.email,
+        contact: donationData.mobile,
+      },
+
+      handler: async (response) => {
+        await axios.post(`${API_BASE}/emandate/verify`, response);
+
+        navigate("/thankyou", {
+          replace: true,
+          state: {
+            frequency: "monthly",
+            uiStatus: "MANDATE_CREATED",
+          },
+        });
+      },
+
+      modal: {
+        ondismiss: () => alert("Mandate cancelled"),
+      },
+    };
+
+    new window.Razorpay(options).open();
+  } catch (err) {
+    console.error(err);
+    alert("Mandate failed");
+  }
+};
+    // -----------------------------testing above logic was working fine
+//   const startSubscription = async () => {
+//   if (expired) return;
+
+//   sessionStorage.setItem("paymentStarted", "true");
+
+//   try {
+//     setStatus("Creating donor...");
+//     const donorRes = await createDonor();
+//     if (!donorRes?.donorId) throw new Error("Donor creation failed");
+
+//     const donorId = donorRes.donorId;
+
+//     setStatus("Authorizing mandate...");
+//     const subRes = await createSubscription(donorId);
+//     if (!subRes?.subscription_id) throw new Error("Subscription failed");
+
+//     const options = {
+//       key: subRes.keyId,
+//       subscription_id: subRes.subscription_id,
+
+//       name: "Feed The Hunger Seva Sangha Foundation",
+//       description: "Monthly Donation (e-Mandate)",
+
+//       prefill: {
+//         name: `${donationData.firstName} ${donationData.lastName}`,
+//         email: donationData.email,
+//         contact: donationData.mobile,
+//       },
+
+//       // ✅ User completed bank authentication
+//       handler: () => {
+//         sessionStorage.removeItem("paymentStarted");
+//         sessionStorage.removeItem(EXPIRY_KEY);
+
+//         navigate("/thankyou", {
+//           replace: true,
+//           state: {
+//             uiStatus: "AUTHENTICATED",
+//             frequency: "monthly",
+//             donorId,
+//             subscriptionId: subRes.subscription_id,
+//             amount: donationData.amount,
+//           },
+//         });
+//       },
+
+//       // ❌ User abandoned
+//       modal: {
+//         ondismiss: () => {
+//           sessionStorage.removeItem("paymentStarted");
+//           sessionStorage.removeItem(EXPIRY_KEY);
+
+//           navigate("/thankyou", {
+//             replace: true,
+//             state: {
+//               uiStatus: "ABANDONED",
+//               frequency: "monthly",
+//               donorId,
+//               subscriptionId: subRes.subscription_id,
+//             },
+//           });
+//         },
+//       },
+
+//       theme: { color: "#0d6efd" },
+//     };
+
+//     new window.Razorpay(options).open();
+//   } catch (err) {
+//     console.error(err);
+//     setStatus("Something went wrong");
+//     sessionStorage.removeItem("paymentStarted");
+//     sessionStorage.removeItem(EXPIRY_KEY);
+//   }
+// };
 
 
   // --------------------------------------------------
@@ -2312,6 +2312,7 @@ const EXPIRY_KEY = "paymentExpiryTime";
 
 export default PaymentPage;
 // working good 
+
 
 
 
