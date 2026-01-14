@@ -265,9 +265,10 @@ function DonationModal() {
       className="border rounded px-3 py-2 w-full"
     >
       <option value="">Please Select E-Mandate  Date </option>
-      <option value="5">5th of Next Month</option>
-      <option value="6">6th of Next Month</option>
       <option value="15">15th of Next Month</option>
+      <option value="16">6th of Next Month</option>
+      <option value="17">17th of Next Month</option>
+       <option value="18">18th of Next Month</option>
     </select>
     {errors.startDay && (
       <p className="error">{errors.startDay.message}</p>
@@ -418,6 +419,7 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
 
 
