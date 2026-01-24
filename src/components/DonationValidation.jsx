@@ -128,6 +128,7 @@ const is18Plus = (date) => {
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
+
 export const DonationValidation = yup.object().shape({
   // amount must be present (we'll make sure it's registered in the form)
   amount: yup.string().required("Donation amount is required"),
