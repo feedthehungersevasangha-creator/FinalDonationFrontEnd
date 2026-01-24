@@ -133,10 +133,21 @@ export const DonationValidation = yup.object().shape({
   amount: yup.string().required("Donation amount is required"),
 
   // customAmount required only when amount === "other"
-  customAmount: yup.string().when("amount", {
+  // customAmount: yup.string().when("amount", {
+  //   is: "other",
+  //   then: () => yup.string().required("Please enter custom amount"),
+  //   otherwise: () => yup.string().nullable().notRequired(),
+  // }),
+    customAmount: yup
+  .number()
+  .typeError("Please enter a valid amount")
+  .when("amount", {
     is: "other",
-    then: () => yup.string().required("Please enter custom amount"),
-    otherwise: () => yup.string().nullable().notRequired(),
+    then: (schema) =>
+      schema
+        .required("Please enter custom amount")
+        .min(25, "Minimum donation amount is ₹25"),
+    otherwise: (schema) => schema.nullable().notRequired(),
   }),
 
   firstName: yup.string().required("First name is required").min(2, "Too short"),
