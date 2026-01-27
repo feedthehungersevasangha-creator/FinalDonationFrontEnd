@@ -2070,7 +2070,7 @@ const EXPIRY_KEY = "paymentExpiryTime";
 
     setStatus("Starting process...");
     const subRes = await createSubscription(donorId);
-    if (!subRes?.subscription_id) throw new Error("Subscription failed");
+    if (!subRes?.subscription_id) throw new Error("E-mandate failed");
 
     const options = {
       key: subRes.keyId,
@@ -2124,64 +2124,13 @@ const EXPIRY_KEY = "paymentExpiryTime";
 
     new window.Razorpay(options).open();
   } catch (err) {
-    console.error("Subscription Error:", err);
+    console.error("E-mandate Error:", err);
     setStatus("Something went wrong");
     sessionStorage.removeItem("paymentStarted");
     sessionStorage.removeItem(EXPIRY_KEY);
   }
 };
-    const startMandate = async () => {
-  try {
-    const res = await axios.post(
-      `${API_BASE}/emandate/create-order`,
-      donationData
-    );
 
-    const options = {
-      key: res.data.keyId,
-      order_id: res.data.orderId,
-      amount: res.data.amount,
-      currency: "INR",
-
-      method: {
-        netbanking: true,
-        card: true,
-        upi: false,
-        wallet: false,
-      },
-
-      name: "Feed The Hunger Seva Sangha Foundation",
-      description: "Bank e-Mandate Authorization",
-
-      prefill: {
-        name: `${donationData.firstName} ${donationData.lastName}`,
-        email: donationData.email,
-        contact: donationData.mobile,
-      },
-
-      handler: async (response) => {
-        await axios.post(`${API_BASE}/emandate/verify`, response);
-
-        navigate("/thankyou", {
-          replace: true,
-          state: {
-            frequency: "monthly",
-            uiStatus: "MANDATE_CREATED",
-          },
-        });
-      },
-
-      modal: {
-        ondismiss: () => alert("Mandate cancelled"),
-      },
-    };
-
-    new window.Razorpay(options).open();
-  } catch (err) {
-    console.error(err);
-    alert("Mandate failed");
-  }
-};
     // -----------------------------testing above logic was working fine
 //   const startSubscription = async () => {
 //   if (expired) return;
@@ -2312,6 +2261,7 @@ const EXPIRY_KEY = "paymentExpiryTime";
 
 export default PaymentPage;
 // working good 
+
 
 
 
