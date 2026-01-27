@@ -426,7 +426,7 @@ function DonationModal() {
   </li>
 
   <li>
-    Before proceeding with an <span className="font-medium">e-Mandate or subscription</span>,
+    Before proceeding with an <span className="font-medium">e-Mandate</span>,
     donors are advised to ensure that their bank account maintains
     <span className="font-medium"> sufficient balance</span> on the scheduled debit date.
   </li>
@@ -452,7 +452,7 @@ function DonationModal() {
   </li>
 
   <li>
-    Once a donation or subscription payment is successfully processed,
+    Once a donation or E-mandate payment is successfully processed,
     <span className="font-medium"> it is non-refundable and non-transferable</span>,
     except where required by applicable law.
   </li>
@@ -479,6 +479,7 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
 
 
