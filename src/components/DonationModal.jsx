@@ -248,7 +248,6 @@ function DonationModal() {
            {frequencyValue === "monthly" && (
             <div className="input-row mb-2">
               <select {...register("paymentMode")} className="border rounded px-2 mb-2 w-full">
-                <option value="">Please Select Donation Mode</option>
                 <option value="E-Mandate">E-Mandate 
                 </option>
                
@@ -265,11 +264,10 @@ function DonationModal() {
       className="border rounded px-3 py-2 w-full"
     >
       <option value="">Please Select E-Mandate  Date </option>
-      <option value="25">25th of Next Month</option>
-      <option value="26">26th of Next Month</option>
-      <option value="27">27th of Next Month</option>
-       <option value="28">28th of Next Month</option>   
-      <option value="29">29th of Next Month</option>
+      <option value="5">5th of Next Month</option>
+      <option value="10">10th of Next Month</option>
+      <option value="15">15th of Next Month</option>
+      
 
     </select>
     {errors.startDay && (
@@ -421,6 +419,7 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
 
 
