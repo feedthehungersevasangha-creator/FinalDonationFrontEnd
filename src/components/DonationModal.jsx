@@ -405,12 +405,72 @@ function DonationModal() {
           </div>
           <div>
             <h3 className="text-lg font-semibold border-b pb-2 mb-2">Terms & Conditions</h3>
-            <ul className="list-disc list-inside space-y-1 text-sm">
-              <li><span className="font-medium">Donations</span> will be accepted only from Indian citizens.</li>
-              <li>No donations are accepted from corporate entities or any Government agencies.</li>
-              <li>All donations are received through <span className="font-medium">Credit Card, NACH, e-Mandates, online transfers, or cheques/drafts</span>, but never in cash.</li>
-              <li>Your donation is critical in running campaigns and enabling victories — we cannot do it without your help.</li>
-            </ul>
+<ul className="list-disc list-inside space-y-1 text-sm">
+
+  <li>
+    <span className="font-medium">Donations</span> will be accepted only from Indian citizens
+    holding a valid Indian bank account.
+  </li>
+
+  <li>
+    Donations are strictly <span className="font-medium">not accepted</span> from
+    corporate entities, foreign nationals, or any Government or semi-Government agencies.
+  </li>
+
+  <li>
+    All donations are accepted only through
+    <span className="font-medium">
+      Credit Cards, Debit Cards, UPI, NACH, e-Mandates, online bank transfers, or cheques/drafts
+    </span>.
+    <span className="font-medium"> Cash donations are not accepted</span>.
+  </li>
+
+  <li>
+    Before proceeding with an <span className="font-medium">e-Mandate or subscription</span>,
+    donors are advised to ensure that their bank account maintains
+    <span className="font-medium"> sufficient balance</span> on the scheduled debit date.
+  </li>
+
+  <li>
+    In case of <span className="font-medium">insufficient balance</span>,
+    bank-level charges, penalty fees, or mandate failure charges may be applied
+    by the donor’s respective bank or payment service provider.
+    <span className="font-medium"> The organization shall not be responsible</span>
+    for such charges.
+  </li>
+
+  <li>
+    The organization is <span className="font-medium">not liable</span> for any
+    additional fees, failed debits, partial debits, or retry charges
+    arising from mandate creation, modification, suspension, or cancellation.
+  </li>
+
+  <li>
+    Mandates may be <span className="font-medium">paused, cancelled, or modified</span>
+    by the donor through their bank or payment provider, subject to applicable rules
+    and timelines.
+  </li>
+
+  <li>
+    Once a donation or subscription payment is successfully processed,
+    <span className="font-medium"> it is non-refundable and non-transferable</span>,
+    except where required by applicable law.
+  </li>
+
+  <li>
+    Donation receipts will be issued only for
+    <span className="font-medium"> successfully completed transactions</span>.
+    Failed or reversed payments will not be eligible for receipts.
+  </li>
+
+  <li>
+    By proceeding with the donation, the donor confirms that all information
+    provided is accurate and agrees to these
+    <span className="font-medium"> Terms & Conditions</span>.
+  </li>
+
+</ul>
+
           </div>
         </div>
       </div>
@@ -419,6 +479,7 @@ function DonationModal() {
 }
 
 export default DonationModal;
+
 
 
 
